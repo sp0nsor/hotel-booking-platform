@@ -1,0 +1,77 @@
+﻿using CSharpFunctionalExtensions;
+using HotelService.Core.ValueObjects;
+
+namespace HotelService.Core.Models
+{
+    public class Hotel
+    {
+        private List<Room> _rooms = [];
+
+        public Guid Id { get; }
+        public string Name { get; }
+        public string Description { get; }
+        public PhoneNumber PhoneNumber { get; }
+        public Address Address { get; }
+        public PriceCategory Category { get; }
+        public IReadOnlyCollection<Room>? Rooms => _rooms;
+
+        public Hotel(
+            Guid id,
+            string name,
+            string description,
+            PhoneNumber phoneNumber,
+            Address address,
+            PriceCategory category,
+            List<Room>? rooms = null)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            PhoneNumber = phoneNumber;
+            Address = address;
+            Category = category;
+            _rooms = rooms ?? new List<Room>();
+        }
+
+        public static Result<Hotel> Create(
+            Guid id,
+            string name,
+            string description,
+            string phoneNumber,
+            string country,
+            string city,
+            string street,
+            string category,
+            List<Room>? rooms = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return Result.Failure<Hotel>("Name can not be null or empty");
+
+            if (string.IsNullOrWhiteSpace(description))
+                return Result.Failure<Hotel>("Description can not be null or empty");
+
+            var numberResult = PhoneNumber.Create(phoneNumber);
+            if (numberResult.IsFailure)
+                return Result.Failure<Hotel>(numberResult.Error);
+
+            var addressResult = Address.Create(country, city, street);
+            if (addressResult.IsFailure)
+                return Result.Failure<Hotel>(addressResult.Error);
+
+            var catagoryResult = PriceCategory.Create(category);
+            if (catagoryResult.IsFailure)
+                return Result.Failure<Hotel>(catagoryResult.Error);
+
+            var hotel = new Hotel(
+                id,
+                name,
+                description,
+                numberResult.Value,
+                addressResult.Value,
+                catagoryResult.Value,
+                rooms);
+
+            return Result.Success(hotel);
+        }
+    }
+}
