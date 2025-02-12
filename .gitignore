@@ -1,0 +1,64 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ASP.NET specific
+bin/
+obj/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+.vscode/
+.vs/
+*.ncrunchproject
+*.ncrunchsolution
+*.build.cs
+_ReSharper*
+*.DotSettings.user
+
+# ASP.NET secret and config files
+secrets.json
+
+# Next.js build output
+.next/
+out/
+
+# Node.js dependencies
+node_modules/
+
+# Ignore generated lock files
+package-lock.json
+yarn.lock
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+
+# Coverage directories and files
+coverage/
+*.lcov
+
+# Local environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE specific files
+.idea/
+*.code-workspace
+*.vs/
+
+# Ignore GitHub-specific files (if hosted on GitHub)
+.github/
+*.md~
