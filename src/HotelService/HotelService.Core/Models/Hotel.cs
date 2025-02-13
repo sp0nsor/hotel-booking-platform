@@ -10,6 +10,7 @@ namespace HotelService.Core.Models
         public Guid Id { get; }
         public string Name { get; }
         public string Description { get; }
+        public Image Image { get; }
         public PhoneNumber PhoneNumber { get; }
         public Address Address { get; }
         public PriceCategory Category { get; }
@@ -22,6 +23,7 @@ namespace HotelService.Core.Models
             PhoneNumber phoneNumber,
             Address address,
             PriceCategory category,
+            Image image,
             List<Room>? rooms = null)
         {
             Id = id;
@@ -30,6 +32,7 @@ namespace HotelService.Core.Models
             PhoneNumber = phoneNumber;
             Address = address;
             Category = category;
+            Image = image;
             _rooms = rooms ?? new List<Room>();
         }
 
@@ -42,6 +45,7 @@ namespace HotelService.Core.Models
             string city,
             string street,
             string category,
+            string imageUrl,
             List<Room>? rooms = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -62,6 +66,10 @@ namespace HotelService.Core.Models
             if (catagoryResult.IsFailure)
                 return Result.Failure<Hotel>(catagoryResult.Error);
 
+            var imageResult = Image.Create(imageUrl);
+            if (imageResult.IsFailure)
+                return Result.Failure <Hotel>(imageResult.Error);
+
             var hotel = new Hotel(
                 id,
                 name,
@@ -69,6 +77,7 @@ namespace HotelService.Core.Models
                 numberResult.Value,
                 addressResult.Value,
                 catagoryResult.Value,
+                imageResult.Value,
                 rooms);
 
             return Result.Success(hotel);
