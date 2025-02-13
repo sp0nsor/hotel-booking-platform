@@ -9,6 +9,7 @@
         public int Number {  get; set; }
         public decimal MoneyAmount { get; set; }
         public string Currency {  get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
         public ICollection<BookedDateEntity> BookedDateEntities { get; set; } = [];
     }
 }

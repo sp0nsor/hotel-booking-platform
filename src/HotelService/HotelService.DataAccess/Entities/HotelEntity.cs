@@ -8,6 +8,7 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
         public string Street { get; set; } = string.Empty;
         public string PriceCategory { get; set; } = string.Empty;
         public ICollection<RoomEntity> Rooms { get; set; } = [];
