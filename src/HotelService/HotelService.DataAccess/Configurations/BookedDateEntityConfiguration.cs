@@ -18,6 +18,8 @@ namespace HotelService.DataAccess.Configurations
 
             builder.Property(b => b.EndDate)
                 .IsRequired();
+
+            builder.HasIndex(b => b.RoomId);
         }
     }
 }
