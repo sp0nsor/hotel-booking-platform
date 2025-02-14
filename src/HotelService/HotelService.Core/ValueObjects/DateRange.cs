@@ -9,8 +9,8 @@ namespace HotelService.Core.ValueObjects
 
         private DateRange(DateTime startDate, DateTime endDate)
         {
-            StartDate = startDate;
-            EndDate = endDate;
+            StartDate = startDate.ToUniversalTime();
+            EndDate = endDate.ToUniversalTime();
         }
 
         public static Result<DateRange> Create(DateTime startDate, DateTime endDate)
