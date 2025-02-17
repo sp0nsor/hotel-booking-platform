@@ -4,7 +4,6 @@ using HotelService.Core.Abstractions;
 using HotelService.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using HotelService.Core.Common;
-using System.Security.Cryptography.X509Certificates;
 
 namespace HotelService.DataAccess.Repositories
 {

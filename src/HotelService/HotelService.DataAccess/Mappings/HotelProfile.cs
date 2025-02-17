@@ -2,6 +2,7 @@
 using HotelService.Core.Models;
 using HotelService.Core.ValueObjects;
 using HotelService.DataAccess.Entities;
+
 namespace HotelService.DataAccess.Mappings
 {
     public class HotelProfile : Profile
