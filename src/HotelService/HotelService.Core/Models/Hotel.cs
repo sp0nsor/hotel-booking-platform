@@ -16,7 +16,7 @@ namespace HotelService.Core.Models
         public PriceCategory Category { get; }
         public IReadOnlyCollection<Room>? Rooms => _rooms;
 
-        public Hotel(
+        private Hotel(
             Guid id,
             string name,
             string description,
@@ -33,7 +33,7 @@ namespace HotelService.Core.Models
             Address = address;
             Category = category;
             Image = image;
-            _rooms = rooms ?? new List<Room>();
+            _rooms = rooms ?? [];
         }
 
         public static Result<Hotel> Create(
