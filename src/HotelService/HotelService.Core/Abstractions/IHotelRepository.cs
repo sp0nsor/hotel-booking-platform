@@ -1,4 +1,5 @@
-﻿using HotelService.Core.Models;
+﻿using HotelService.Core.Common;
+using HotelService.Core.Models;
 
 namespace HotelService.Core.Abstractions
 {
@@ -6,7 +7,7 @@ namespace HotelService.Core.Abstractions
     {
         Task<Guid> Create(Hotel hotel, CancellationToken cancellationToken);
         Task<Guid> Delete(Guid id, CancellationToken cancellationToken);
-        Task<List<Hotel>> Get(CancellationToken cancellationToken);
+        Task<PaginatedResult<Hotel>> Get(int pageIndex, int pageSize, CancellationToken cancellationToken);
         Task<Hotel> GetById(Guid id, CancellationToken cancellationToken);
         Task<Guid> Update(Hotel hotel, CancellationToken cancellationToken);
     }

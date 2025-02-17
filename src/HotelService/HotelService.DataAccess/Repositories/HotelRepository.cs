@@ -3,6 +3,8 @@ using HotelService.Core.Models;
 using HotelService.Core.Abstractions;
 using HotelService.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using HotelService.Core.Common;
+using System.Security.Cryptography.X509Certificates;
 
 namespace HotelService.DataAccess.Repositories
 {
@@ -31,16 +33,36 @@ namespace HotelService.DataAccess.Repositories
             return hotelEntity.Id;
         }
 
-        public async Task<List<Hotel>> Get(
+        public async Task<PaginatedResult<Hotel>> Get(
+            int pageIndex,
+            int pageSize,
             CancellationToken cancellationToken)
         {
+            int skipAmount = (pageIndex - 1) * pageSize;
+
+            var totalCountTask = context.Hotels.CountAsync(cancellationToken);
+
             var hotelEntities = await context.Hotels
                 .AsNoTracking()
+                .OrderBy(h => h.Id)
+                .Skip(skipAmount)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
             var hotels = mapper.Map<List<Hotel>>(hotelEntities);
+            
+            int totalCount = await totalCountTask;
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            return hotels;
+            var result = new PaginatedResult<Hotel>
+            {
+                Items = hotels,
+                CurrentPage = pageIndex,
+                TotalPages = totalPages,
+                PageSize = pageSize
+            };
+
+            return result;
         }
 
         public async Task<Hotel> GetById(
