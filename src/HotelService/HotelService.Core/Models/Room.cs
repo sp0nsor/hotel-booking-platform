@@ -12,6 +12,7 @@ namespace HotelService.Core.Models
         public int Capacity { get; }
         public int Area { get; }
         public int Number {  get; }
+        public Image Image { get; }
         public Money Price { get; }
         public IReadOnlyCollection<DateRange> BookedDates => _bookedDates;
 
@@ -21,7 +22,8 @@ namespace HotelService.Core.Models
             int capacity,
             int area, 
             int number,
-            Money price)
+            Money price,
+            Image image)
         {
             Id = id;
             HotelId = hotelId;
@@ -29,6 +31,7 @@ namespace HotelService.Core.Models
             Area = area;
             Number = number;
             Price = price;
+            Image = image;
         }
 
         public static Result<Room> Create(
@@ -38,7 +41,8 @@ namespace HotelService.Core.Models
             int area,
             int number,
             int moneyAmount,
-            string currency)
+            string currency,
+            string imageUrl)
         {
             if (capacity < 0)
                 return Result.Failure<Room>("Capacity can not be negative");
@@ -53,7 +57,18 @@ namespace HotelService.Core.Models
             if (priceResult.IsFailure)
                 return Result.Failure<Room>(priceResult.Error);
 
-            var room = new Room(id, hotelId, capacity, area, number, priceResult.Value);
+            var imageResult = Image.Create(imageUrl);
+            if(imageResult.IsFailure)
+                return Result.Failure<Room>(imageResult.Error);
+
+            var room = new Room(
+                id, 
+                hotelId,
+                capacity, 
+                area, 
+                number,
+                priceResult.Value, 
+                imageResult.Value);
 
             return Result.Success(room);
         }
