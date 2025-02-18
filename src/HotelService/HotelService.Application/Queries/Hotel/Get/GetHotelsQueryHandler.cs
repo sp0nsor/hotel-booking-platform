@@ -1,4 +1,5 @@
-﻿using HotelService.Application.DTOs;
+﻿using AutoMapper;
+using HotelService.Application.DTOs;
 using HotelService.Core.Abstractions;
 using HotelService.Core.Common;
 using MediatR;
@@ -7,10 +8,14 @@ namespace HotelService.Application.Queries.Hotel.Get
 {
     public class GetHotelsQueryHandler : IRequestHandler<GetHotelsQuery, PaginatedResult<HotelDto>>
     {
+        private readonly IMapper mapper;
         private readonly IHotelRepository hotelRepository;
 
-        public GetHotelsQueryHandler(IHotelRepository hotelRepository)
+        public GetHotelsQueryHandler(
+            IMapper mapper,
+            IHotelRepository hotelRepository)
         {
+            this.mapper = mapper;
             this.hotelRepository = hotelRepository;
         }
 
@@ -21,9 +26,17 @@ namespace HotelService.Application.Queries.Hotel.Get
                 request.PageSize,
                 cancellationToken);
 
-            // mapping to hotel dto
+            var hotelDtos = mapper.Map<List<HotelDto>>(hotelsPage.Items);
 
-            return new PaginatedResult<HotelDto>();
+            var paginatedResult = new PaginatedResult<HotelDto>
+            {
+                Items = hotelDtos,
+                PageSize = hotelsPage.PageSize,
+                CurrentPage = hotelsPage.CurrentPage,
+                TotalPages = hotelsPage.TotalPages
+            };
+
+            return paginatedResult;
         }
     }
 }

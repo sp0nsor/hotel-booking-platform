@@ -1,4 +1,6 @@
-﻿using HotelService.Application.Interfaces;
+﻿using HotelService.Application.DTOs;
+using HotelService.Application.Interfaces;
+using HotelService.Application.Mappings;
 using HotelService.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +12,10 @@ namespace HotelService.Application
             this IServiceCollection services)
         {
             services.AddScoped<IImageService, ImageService>();
+
+            services.AddAutoMapper(typeof(HotelDtoProfile));
+            services.AddAutoMapper(typeof(RoomDto));
+            services.AddAutoMapper(typeof(ValueObjectsProfile));
 
             return services;
         }

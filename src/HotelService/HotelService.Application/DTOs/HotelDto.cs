@@ -1,14 +1,14 @@
-﻿namespace HotelService.Application.DTOs
+﻿using HotelService.Core.ValueObjects;
+
+namespace HotelService.Application.DTOs
 {
     public record HotelDto(
         Guid Id,
         string Name,
         string Description,
-        string PhoneNumber,
-        string Country,
-        string City,
-        string Street,
-        string Category,
-        string ImageUrl,
+        Image Image,
+        PhoneNumber PhoneNumber,
+        Address Address,
+        PriceCategory Category,
         List<RoomDto> Rooms);
 }

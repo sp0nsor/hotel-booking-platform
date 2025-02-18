@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using AutoMapper;
+using CSharpFunctionalExtensions;
 using HotelService.Application.DTOs;
 using HotelService.Core.Abstractions;
 using MediatR;
@@ -7,10 +8,14 @@ namespace HotelService.Application.Queries.Hotel.GetById
 {
     public class GetHotelByIdQueryHandler : IRequestHandler<GetHotelByIdQuery, Result<HotelDto>>
     {
+        private readonly IMapper mapper;
         private readonly IHotelRepository hotelRepository;
 
-        public GetHotelByIdQueryHandler(IHotelRepository hotelRepository)
+        public GetHotelByIdQueryHandler(
+            IMapper mapper,
+            IHotelRepository hotelRepository)
         {
+            this.mapper = mapper;
             this.hotelRepository = hotelRepository;
         }
 
@@ -21,9 +26,9 @@ namespace HotelService.Application.Queries.Hotel.GetById
             if (hotel is null)
                 return Result.Failure<HotelDto>("Hotel not found");
 
-            // map hotel to hotel dto
+            var hotelDto = mapper.Map<HotelDto>(hotel);
 
-            return Result.Success<HotelDto>(new());
+            return Result.Success(hotelDto);
         }
     }
 }
