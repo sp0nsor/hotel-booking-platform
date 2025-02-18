@@ -1,3 +1,4 @@
+using HotelService.Application;
 using HotelService.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services
+    .AddApplication()
     .AddDataAccess(configuration);
 
 var app = builder.Build();

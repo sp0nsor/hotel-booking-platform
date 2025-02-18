@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotelService.Core.Abstractions;
+using HotelService.DataAccess.Mappings;
+using HotelService.DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +17,12 @@ namespace HotelService.DataAccess
             {
                 options.UseNpgsql(configuration.GetConnectionString(nameof(HotelDbContext)));
             });
+
+            services.AddScoped<IHotelRepository, HotelRepository>();
+
+            services.AddAutoMapper(typeof(HotelProfile));
+            services.AddAutoMapper(typeof(RoomProfile));
+            services.AddAutoMapper(typeof(BookedDateProfile));
 
             return services;
         }
