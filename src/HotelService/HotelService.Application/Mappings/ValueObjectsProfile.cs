@@ -10,7 +10,7 @@ namespace HotelService.Application.Mappings
             CreateMap<Image, Image>();
             CreateMap<PhoneNumber, PhoneNumber>();
             CreateMap<Address, Address>();
-            CreateMap<PriceCategory, PriceCategory>();
+            CreateMap<Category, Category>();
             CreateMap<DateRange, DateRange>();
             CreateMap<Money, Money>();
         }

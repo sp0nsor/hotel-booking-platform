@@ -12,13 +12,23 @@ namespace HotelService.DataAccess.Mappings
             CreateMap<Room, RoomEntity>()
                 .ForMember(dest => dest.MoneyAmount, opt => opt.MapFrom(src => src.Price.Amount))
                 .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Price.Currency))
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Image.Url))
-                .ForMember(dest => dest.BookedDateEntities, opt => opt.MapFrom(src => src.BookedDates));
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Image.Value))
+                .ForMember(dest => dest.BookedDates, opt => opt.MapFrom(src => src.BookedDates));
 
             CreateMap<RoomEntity, Room>()
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => Money.Create(src.MoneyAmount, src.Currency).Value))
-                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => Image.Create(src.ImageUrl).Value))
-                .ForMember(dest => dest.BookedDates, opt => opt.MapFrom(src => src.BookedDateEntities));
+                .ConstructUsing(src => Room.Create(
+                    src.Id,
+                    src.HotelId,
+                    src.Capacity,
+                    src.Area,
+                    src.Number,
+                    src.MoneyAmount,
+                    src.Currency,
+                    src.ImageUrl,
+                    src.BookedDates.Select(d => 
+                        DateRange.Create(d.StartDate, d.EndDate).Value)
+                        .ToList())
+                .Value);
         }
     }
 }

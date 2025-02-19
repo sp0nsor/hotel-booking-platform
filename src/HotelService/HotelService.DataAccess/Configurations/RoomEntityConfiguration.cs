@@ -32,7 +32,7 @@ namespace HotelService.DataAccess.Configurations
             builder.Property(r => r.ImageUrl)
                 .IsRequired();
 
-            builder.HasMany(r => r.BookedDateEntities)
+            builder.HasMany(r => r.BookedDates)
                 .WithOne()
                 .HasForeignKey(b => b.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);

@@ -13,7 +13,7 @@ namespace HotelService.Core.Models
         public Image Image { get; }
         public PhoneNumber PhoneNumber { get; }
         public Address Address { get; }
-        public PriceCategory Category { get; }
+        public Category Category { get; }
         public IReadOnlyCollection<Room>? Rooms => _rooms;
 
         private Hotel(
@@ -22,7 +22,7 @@ namespace HotelService.Core.Models
             string description,
             PhoneNumber phoneNumber,
             Address address,
-            PriceCategory category,
+            Category category,
             Image image,
             List<Room>? rooms = null)
         {
@@ -62,7 +62,7 @@ namespace HotelService.Core.Models
             if (addressResult.IsFailure)
                 return Result.Failure<Hotel>(addressResult.Error);
 
-            var catagoryResult = PriceCategory.Create(category);
+            var catagoryResult = Category.Create(category);
             if (catagoryResult.IsFailure)
                 return Result.Failure<Hotel>(catagoryResult.Error);
 

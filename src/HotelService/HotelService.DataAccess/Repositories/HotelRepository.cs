@@ -39,7 +39,7 @@ namespace HotelService.DataAccess.Repositories
         {
             int skipAmount = (pageIndex - 1) * pageSize;
 
-            var totalCountTask = context.Hotels.CountAsync(cancellationToken);
+            var totalCount = await context.Hotels.CountAsync(cancellationToken);
 
             var hotelEntities = await context.Hotels
                 .AsNoTracking()
@@ -50,7 +50,6 @@ namespace HotelService.DataAccess.Repositories
 
             var hotels = mapper.Map<List<Hotel>>(hotelEntities);
             
-            int totalCount = await totalCountTask;
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
             var result = new PaginatedResult<Hotel>
@@ -70,7 +69,7 @@ namespace HotelService.DataAccess.Repositories
         {
             var hotelEntity = await context.Hotels
                 .Include(h => h.Rooms)
-                .ThenInclude(r => r.BookedDateEntities)
+                    .ThenInclude(r => r.BookedDates)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(h => h.Id == id, cancellationToken);
 
