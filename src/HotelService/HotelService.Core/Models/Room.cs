@@ -76,36 +76,5 @@ namespace HotelService.Core.Models
 
             return Result.Success(room);
         }
-
-        public Result AddBooking(DateTime startDate, DateTime endDate)
-        {
-            var dateRangeResult = DateRange.Create(startDate, endDate);
-            if(dateRangeResult.IsFailure)
-                return Result.Failure(dateRangeResult.Error);
-
-            if (_bookedDates.Any(range => range.Overlaps(dateRangeResult.Value)))
-                return Result.Failure("Date range overlaps with existing bookings");
-
-            _bookedDates.Add(dateRangeResult.Value);
-
-            return Result.Success();
-        }
-
-        public Result RemoveBooking(DateTime startDate, DateTime endDate)
-        {
-            var dateRangeResult = DateRange.Create(startDate, endDate);
-            if (dateRangeResult.IsFailure)
-                return Result.Failure(dateRangeResult.Error);
-
-            var existingRange = _bookedDates.FirstOrDefault(range => 
-                range == dateRangeResult.Value);
-
-            if (existingRange is null)
-                return Result.Failure("Booking not found");
-
-            _bookedDates.Remove(existingRange);
-
-            return Result.Success();
-        }
     }
 }

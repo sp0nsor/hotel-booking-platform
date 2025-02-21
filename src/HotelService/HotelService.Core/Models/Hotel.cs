@@ -82,29 +82,5 @@ namespace HotelService.Core.Models
 
             return Result.Success(hotel);
         }
-
-        public Result AddRoom(Room room)
-        {
-            if (room is null)
-                return Result.Failure("Room can not be null");
-
-            if (_rooms.Any(r => r.Number == room.Number))
-                return Result.Failure("Room with the same number alredy axists");
-
-            _rooms.Add(room);
-            
-            return Result.Success();
-        }
-
-        public Result RemoveRoom(int roomNumber)
-        {
-            var room  = _rooms.FirstOrDefault(r => r.Number == roomNumber);
-            if (room is null)
-                return Result.Failure("Room not found");
-
-            _rooms.Remove(room);
-
-            return Result.Success();
-        }
     }
 }
