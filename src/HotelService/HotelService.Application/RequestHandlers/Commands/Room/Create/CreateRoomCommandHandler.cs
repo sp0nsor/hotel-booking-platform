@@ -2,7 +2,6 @@
 using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Create
 {
@@ -26,24 +25,37 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
             CreateRoomCommand request,
             CancellationToken cancellationToken)
         {
-            var hotelTask = hotelRepository.GetByIdAsync(
+            var getHotelTask = hotelRepository.GetByIdAsync(
                 request.HotelId,
                 cancellationToken,
                 includeProperties: "Rooms");
 
-            var imageResult = await imageService.WriteImage(request.Image, cancellationToken);
-            if(imageResult.IsFailure)
-                return Result.Failure<Guid>(imageResult.Error);
+            var writeImageResult = await imageService
+                .WriteImageAsync(request.Image, cancellationToken);
+            if(writeImageResult.IsFailure)
+                return Result.Failure(writeImageResult.Error);
 
-            var hotel = await hotelTask;
+            var hotel = await getHotelTask;
             if (hotel is null)
+            {
+                await imageService.DeleteImageAsync(
+                    writeImageResult.Value,
+                    cancellationToken);
+
                 return Result.Failure("Hotel not found");
+            }
 
-            var existRoom = hotel.Rooms.FirstOrDefault(r => r.Number == request.Number);
+            var existRoom = hotel.Rooms?.FirstOrDefault(r => r.Number == request.Number);
             if (existRoom != null)
-                return Result.Failure("Room whith this number exist");
+            {
+                await imageService.DeleteImageAsync(
+                    writeImageResult.Value,
+                    cancellationToken);
 
-            var roomResult = Core.Models.Room.Create(
+                return Result.Failure("Room whith this number exist");
+            }
+
+            var createRoomResult = Core.Models.Room.Create(
                 Guid.NewGuid(),
                 request.HotelId,
                 request.Capacity,
@@ -51,13 +63,13 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
                 request.Number,
                 request.MoneyAmount,
                 request.Currency,
-                imageResult.Value);
+                writeImageResult.Value);
 
-            if(roomResult.IsFailure)
-                return Result.Failure(roomResult.Error);
+            if(createRoomResult.IsFailure)
+                return Result.Failure(createRoomResult.Error);
 
             await roomRepository.AddAsync(
-                roomResult.Value,
+                createRoomResult.Value,
                 cancellationToken);
 
             return Result.Success();

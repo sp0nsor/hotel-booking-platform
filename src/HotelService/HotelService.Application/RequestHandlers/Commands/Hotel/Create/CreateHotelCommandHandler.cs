@@ -22,14 +22,14 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Create
             CreateHotelCommand request,
             CancellationToken cancellationToken)
         {
-            var imageResult = await imageService.WriteImage(
+            var writeImageResult = await imageService.WriteImageAsync(
                 request.Image,
                 cancellationToken);
 
-            if (imageResult.IsFailure)
-                return Result.Failure(imageResult.Error);
+            if (writeImageResult.IsFailure)
+                return Result.Failure(writeImageResult.Error);
 
-            var hotelResult = Core.Models.Hotel.Create(
+            var createHotelResult = Core.Models.Hotel.Create(
                 Guid.NewGuid(),
                 request.Name,
                 request.Description,
@@ -38,13 +38,13 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Create
                 request.City,
                 request.Street,
                 request.PriceCategory,
-                imageResult.Value
+                writeImageResult.Value
             );
 
-            if (hotelResult.IsFailure)
-                return Result.Failure(hotelResult.Error);
+            if (createHotelResult.IsFailure)
+                return Result.Failure(createHotelResult.Error);
 
-            await hotelRepository.AddAsync(hotelResult.Value, cancellationToken);
+            await hotelRepository.AddAsync(createHotelResult.Value, cancellationToken);
 
             return Result.Success();
         }

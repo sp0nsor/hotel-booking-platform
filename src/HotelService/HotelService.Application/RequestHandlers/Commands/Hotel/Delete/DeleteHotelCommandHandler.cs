@@ -1,15 +1,19 @@
-﻿using HotelService.Core.Abstractions;
+﻿using HotelService.Application.Interfaces;
+using HotelService.Core.Abstractions;
 using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Commands.Hotel.Delete
 {
     public class DeleteHotelCommandHandler : IRequestHandler<DeleteHotelCommand>
     {
+        private readonly IImageService imageService;
         private readonly IRepository<Core.Models.Hotel> hotelRepository;
 
         public DeleteHotelCommandHandler(
+            IImageService imageService,
             IRepository<Core.Models.Hotel> hotelRepository)
         {
+            this.imageService = imageService;
             this.hotelRepository = hotelRepository;
         }
 
@@ -23,6 +27,8 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Delete
 
             if (hotel is null)
                 return;
+
+            await imageService.DeleteImageAsync(hotel.Image.Value, cancellationToken);
 
             await hotelRepository.DeleteAsync(hotel, cancellationToken);
         }

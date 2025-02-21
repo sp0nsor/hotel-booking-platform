@@ -22,14 +22,25 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
             UpdateHotelCommand request, 
             CancellationToken cancellationToken)
         {
-            var imageResult = await imageService.WriteImage(
+            var existHotel = await hotelRepository.GetByIdAsync(
+                request.Id,
+                cancellationToken);
+
+            if (existHotel is null)
+                return Result.Failure("Hotel not found");
+
+            var deleteOldImageTask = imageService.DeleteImageAsync(
+                existHotel.Image.Value,
+                cancellationToken);
+
+            var writeImageResult = await imageService.WriteImageAsync(
                 request.Image,
                 cancellationToken);
 
-            if (imageResult.IsFailure)
-                return Result.Failure(imageResult.Error);
+            if (writeImageResult.IsFailure)
+                return Result.Failure(writeImageResult.Error);
 
-            var hotelResult = Core.Models.Hotel.Create(
+            var createHotelResult = Core.Models.Hotel.Create(
                 request.Id,
                 request.Name,
                 request.Description,
@@ -38,13 +49,15 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
                 request.City,
                 request.Street,
                 request.PriceCategory,
-                imageResult.Value
+                writeImageResult.Value
             );
 
-            if (hotelResult.IsFailure)
-                return Result.Failure(hotelResult.Error);
+            if (createHotelResult.IsFailure)
+                return Result.Failure(createHotelResult.Error);
 
-            await hotelRepository.UpdateAsync(hotelResult.Value, cancellationToken);
+            await hotelRepository.UpdateAsync(createHotelResult.Value, cancellationToken);
+
+            await deleteOldImageTask;
 
             return Result.Success();
         }

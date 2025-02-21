@@ -25,7 +25,18 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
             UpdateRoomCommand request, 
             CancellationToken cancellationToken)
         {
-            var imageResult = await imageService.WriteImage(request.Image, cancellationToken);
+            var existRoom = await roomRepository.GetByIdAsync(
+                request.Id,
+                cancellationToken);
+
+            if (existRoom is null)
+                return Result.Failure("Room not found");
+
+            var deleteOldImageTask = imageService.DeleteImageAsync(
+                existRoom.Image.Value,
+                cancellationToken);
+
+            var imageResult = await imageService.WriteImageAsync(request.Image, cancellationToken);
 
             if (imageResult.IsFailure)
                 return Result.Failure(imageResult.Error);
@@ -44,6 +55,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                 return Result.Failure(roomResult.Error);
 
             await roomRepository.UpdateAsync(roomResult.Value, cancellationToken);
+            await deleteOldImageTask;
 
             return Result.Success();
         }
