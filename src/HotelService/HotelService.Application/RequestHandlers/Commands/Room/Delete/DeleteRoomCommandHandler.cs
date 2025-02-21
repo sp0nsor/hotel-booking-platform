@@ -17,7 +17,9 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Delete
             DeleteRoomCommand request,
             CancellationToken cancellationToken)
         {
-            var room = await roomRepository.GetByIdAsync(request.Id);
+            var room = await roomRepository.GetByIdAsync(
+                request.Id,
+                cancellationToken);
 
             if(room is null)
                 return;

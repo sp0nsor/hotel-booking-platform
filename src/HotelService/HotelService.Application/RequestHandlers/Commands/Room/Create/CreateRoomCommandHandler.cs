@@ -26,7 +26,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
             CreateRoomCommand request,
             CancellationToken cancellationToken)
         {
-            var hotelTask = hotelRepository.GetByIdWithIncludeAsync(
+            var hotelTask = hotelRepository.GetByIdAsync(
                 request.HotelId,
                 cancellationToken,
                 includeProperties: "Rooms");

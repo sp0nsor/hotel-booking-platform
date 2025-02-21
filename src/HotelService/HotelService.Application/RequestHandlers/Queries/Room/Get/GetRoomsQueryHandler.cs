@@ -26,7 +26,7 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.Get
             GetRoomsQuery request, 
             CancellationToken cancellationToken)
         {
-            var hotel = await hotelRepository.GetByIdWithIncludeAsync(
+            var hotel = await hotelRepository.GetByIdAsync(
                 request.HotelId,
                 cancellationToken,
                 includeProperties: "Rooms");

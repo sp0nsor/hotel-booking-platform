@@ -21,15 +21,6 @@ namespace HotelService.DataAccess.Repositories
 
         public async Task<TDomain?> GetByIdAsync(
             Guid id,
-            CancellationToken cancellationToken = default)
-        {
-            var entity = await dbSet.FindAsync(id, cancellationToken);
-
-            return entity != null ? mapper.Map<TDomain>(entity) : null;
-        }
-
-        public async Task<TDomain?> GetByIdWithIncludeAsync(
-            Guid id,
             CancellationToken cancellationToken,
             params string[] includeProperties)
         {
@@ -39,6 +30,7 @@ namespace HotelService.DataAccess.Repositories
                 query = query.Include(includeProperty);
 
             var entity = await query
+                .AsNoTracking()
                 .FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, cancellationToken);
 
             return entity != null ? mapper.Map<TDomain>(entity) : null;

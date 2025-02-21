@@ -23,7 +23,7 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
             GetRoomByIdQuery request, 
             CancellationToken cancellationToken)
         {
-            var room = await roomRepository.GetByIdWithIncludeAsync(
+            var room = await roomRepository.GetByIdAsync(
                 request.Id,
                 cancellationToken,
                 includeProperties: "BookedDates");
