@@ -78,21 +78,19 @@ namespace HotelService.DataAccess.Repositories
             CancellationToken cancellationToken = default)
         {
             var entity = mapper.Map<TEntity>(domain);
-            dbSet.Attach(entity);
-            context.Entry(entity).State = EntityState.Modified;
+            
+            dbSet.Update(entity);
 
             await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteAsync(
-            Guid id,
+            TDomain domain,
             CancellationToken cancellationToken = default)
         {
-            var entity = await dbSet.FindAsync(id, cancellationToken);
-            if (entity != null)
-            {
-                dbSet.Remove(entity);
-            }
+            var entity = mapper.Map<TEntity>(domain);
+
+            dbSet.Remove(entity);
 
             await context.SaveChangesAsync(cancellationToken);
         }

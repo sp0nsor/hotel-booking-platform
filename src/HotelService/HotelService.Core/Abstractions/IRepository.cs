@@ -9,6 +9,6 @@ namespace HotelService.Core.Abstractions
         Task<(IEnumerable<TDomain> Items, int TotalPages)> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
         Task AddAsync(TDomain entity, CancellationToken cancellationToken = default);
         Task UpdateAsync(TDomain entity, CancellationToken cancellationToken = default);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(TDomain entity, CancellationToken cancellationToken = default);
     }
 }
