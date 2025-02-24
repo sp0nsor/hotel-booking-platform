@@ -1,6 +1,6 @@
 ﻿namespace HotelService.DataAccess.Entities
 {
-    public class BookedDateEntity
+    public class BookedDatesEntity
     {
         public Guid Id { get; set; }
         public Guid RoomId { get; set; }

@@ -5,7 +5,7 @@ namespace HotelService.Core.Models
 {
     public class Room
     {
-        private List<DateRange> _bookedDates = [];
+        private List<BookedDates> _bookedDates = [];
 
         public Guid Id { get; }
         public Guid HotelId { get; }
@@ -14,7 +14,7 @@ namespace HotelService.Core.Models
         public int Number {  get; }
         public Image Image { get; }
         public Money Price { get; }
-        public IReadOnlyCollection<DateRange> BookedDates => _bookedDates;
+        public IReadOnlyCollection<BookedDates> BookedDates => _bookedDates;
 
         private Room(
             Guid id,
@@ -24,7 +24,7 @@ namespace HotelService.Core.Models
             int number,
             Money price,
             Image image,
-            List<DateRange>? bookedDates = null)
+            List<BookedDates>? bookedDates = null)
         {
             Id = id;
             HotelId = hotelId;
@@ -45,7 +45,7 @@ namespace HotelService.Core.Models
             decimal moneyAmount,
             string currency,
             string imageUrl, 
-            List<DateRange>? bookedDates = null)
+            List<BookedDates>? bookedDates = null)
         {
             if (capacity < 0)
                 return Result.Failure<Room>("Capacity can not be negative");

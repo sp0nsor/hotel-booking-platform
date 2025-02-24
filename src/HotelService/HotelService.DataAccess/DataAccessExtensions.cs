@@ -25,6 +25,7 @@ namespace HotelService.DataAccess
 
             services.AddAutoMapper(typeof(HotelProfile));
             services.AddAutoMapper(typeof(RoomProfile));
+            services.AddAutoMapper(typeof(BookedDatesEntity));
 
             return services;
         }

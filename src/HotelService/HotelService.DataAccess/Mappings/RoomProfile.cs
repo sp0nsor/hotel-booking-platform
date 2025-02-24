@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using HotelService.Core.Models;
-using HotelService.Core.ValueObjects;
 using HotelService.DataAccess.Entities;
 
 namespace HotelService.DataAccess.Mappings
@@ -16,7 +15,7 @@ namespace HotelService.DataAccess.Mappings
                 .ForMember(dest => dest.BookedDates, opt => opt.MapFrom(src => src.BookedDates));
 
             CreateMap<RoomEntity, Room>()
-                .ConstructUsing(src => Room.Create(
+                .ConstructUsing((src, ctx) => Room.Create(
                     src.Id,
                     src.HotelId,
                     src.Capacity,
@@ -25,10 +24,8 @@ namespace HotelService.DataAccess.Mappings
                     src.MoneyAmount,
                     src.Currency,
                     src.ImageUrl,
-                    src.BookedDates.Select(d => 
-                        DateRange.Create(d.StartDate, d.EndDate).Value)
-                        .ToList())
-                .Value);
+                    src.BookedDates.Select(bookedDatesEntity => ctx.Mapper.Map<BookedDates>(bookedDatesEntity)).ToList()
+                ).Value);
         }
     }
 }

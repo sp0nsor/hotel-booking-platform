@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace HotelService.DataAccess.Configurations
 {
-    public class BookedDateEntityConfiguration : IEntityTypeConfiguration<BookedDateEntity>
+    public class BookedDatesEntityConfiguration : IEntityTypeConfiguration<BookedDatesEntity>
     {
-        public void Configure(EntityTypeBuilder<BookedDateEntity> builder)
+        public void Configure(EntityTypeBuilder<BookedDatesEntity> builder)
         {
             builder.HasKey(b => b.Id);
 
