@@ -19,7 +19,7 @@ namespace HotelService.DataAccess.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<TDomain?> GetByIdAsync(
+        public virtual async Task<TDomain?> GetByIdAsync(
             Guid id,
             CancellationToken cancellationToken,
             params string[] includeProperties)
@@ -36,10 +36,10 @@ namespace HotelService.DataAccess.Repositories
             return entity != null ? mapper.Map<TDomain>(entity) : null;
         }
 
-        public async Task<(IEnumerable<TDomain> Items, int TotalPages)> GetAllAsync(
+        public virtual async Task<(IEnumerable<TDomain> Items, int TotalPages)> GetAllAsync(
             int pageIndex,
             int pageSize,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var totalCount = await dbSet.CountAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
@@ -55,9 +55,9 @@ namespace HotelService.DataAccess.Repositories
             return (Items: items, TotalPages: totalPages);
         }
 
-        public async Task AddAsync(
+        public virtual async Task AddAsync(
             TDomain domain,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var entity = mapper.Map<TEntity>(domain);
             await dbSet.AddAsync(entity, cancellationToken);
@@ -65,9 +65,9 @@ namespace HotelService.DataAccess.Repositories
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(
+        public virtual async Task UpdateAsync(
             TDomain domain,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var entity = mapper.Map<TEntity>(domain);
             
@@ -76,9 +76,9 @@ namespace HotelService.DataAccess.Repositories
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(
+        public virtual async Task DeleteAsync(
             TDomain domain,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var entity = mapper.Map<TEntity>(domain);
 

@@ -1,42 +1,47 @@
 ﻿using AutoMapper;
-using CSharpFunctionalExtensions;
 using HotelService.Application.DTOs;
 using HotelService.Core.Abstractions;
 using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Room.Get
 {
-    public class GetRoomsQueryHandler : IRequestHandler<GetRoomsQuery, Result<List<RoomDto>>>
+    public class GetRoomsQueryHandler : IRequestHandler<GetRoomsQuery, PaginatedResult<RoomDto>>
     {
         private readonly IMapper mapper;
+        private readonly IRoomRepository roomRepository;
         private readonly IRepository<Core.Models.Hotel> hotelRepository;
-        private readonly IRepository<Core.Models.Room> roomRepository;
 
         public GetRoomsQueryHandler(
             IMapper mapper,
-            IRepository<Core.Models.Hotel> hotelRepository,
-            IRepository<Core.Models.Room> roomRepository)
+            IRoomRepository roomRepository,
+            IRepository<Core.Models.Hotel> hotelRepository)
         {
             this.mapper = mapper;
-            this.hotelRepository = hotelRepository;
             this.roomRepository = roomRepository;
+            this.hotelRepository = hotelRepository;
         }
 
-        public async Task<Result<List<RoomDto>>> Handle(
+        public async Task<PaginatedResult<RoomDto>> Handle(
             GetRoomsQuery request, 
             CancellationToken cancellationToken)
         {
-            var hotel = await hotelRepository.GetByIdAsync(
+            var (rooms, totalPages) = await roomRepository.GetAllAsync(
                 request.HotelId,
-                cancellationToken,
-                includeProperties: "Rooms");
+                request.PageIndex,
+                request.PageSize, 
+                cancellationToken);
 
-            if (hotel is null)
-                return Result.Failure<List<RoomDto>>("Hotel not found");
+            var roomsDto = mapper.Map<List<RoomDto>>(rooms);
 
-            var roomDtos = mapper.Map<List<RoomDto>>(hotel.Rooms);
+            var paginatedResult = new PaginatedResult<RoomDto>
+            {
+                Items = roomsDto,
+                PageSize = request.PageSize,
+                CurrentPage = request.PageIndex,
+                TotalPages = totalPages
+            };
 
-            return Result.Success(roomDtos);
+            return paginatedResult;
         }
     }
 }

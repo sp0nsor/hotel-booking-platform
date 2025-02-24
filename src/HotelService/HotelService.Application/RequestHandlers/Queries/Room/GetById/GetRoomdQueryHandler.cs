@@ -9,11 +9,11 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
     public class GetRoomdQueryHandler : IRequestHandler<GetRoomByIdQuery, Result<RoomDto>>
     {
         private readonly IMapper mapper;
-        private readonly IRepository<Core.Models.Room> roomRepository;
+        private readonly IRoomRepository roomRepository;
 
         public GetRoomdQueryHandler(
             IMapper mapper,
-            IRepository<Core.Models.Room> roomRepository)
+            IRoomRepository roomRepository)
         {
             this.mapper = mapper;
             this.roomRepository = roomRepository;
@@ -25,8 +25,8 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
         {
             var room = await roomRepository.GetByIdAsync(
                 request.Id,
-                cancellationToken,
-                includeProperties: "BookedDates");
+                request.HotelId,
+                cancellationToken);
 
             if (room is null)
                 return Result.Failure<RoomDto>("Room not found");

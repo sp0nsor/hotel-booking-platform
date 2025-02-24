@@ -22,6 +22,7 @@ namespace HotelService.DataAccess
 
             services.AddScoped<IRepository<Hotel>, Repository<Hotel, HotelEntity>>();
             services.AddScoped<IRepository<Room>, Repository<Room, RoomEntity>>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
 
             services.AddAutoMapper(typeof(HotelProfile));
             services.AddAutoMapper(typeof(RoomProfile));

@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace HotelService.Core.Abstractions
+﻿namespace HotelService.Core.Abstractions
 {
     public interface IRepository<TDomain> where TDomain : class
     {

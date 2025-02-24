@@ -1,5 +1,4 @@
-﻿using HotelService.API.Contracts;
-using HotelService.Application.RequestHandlers.Commands.Hotel.Delete;
+﻿using HotelService.Application.RequestHandlers.Commands.Hotel.Delete;
 using HotelService.Application.DTOs;
 using HotelService.Application.RequestHandlers.Queries.Hotel.GetById;
 using HotelService.Application.RequestHandlers.Commands.Hotel.Create;
@@ -7,7 +6,6 @@ using HotelService.Application.RequestHandlers.Commands.Hotel.Update;
 using HotelService.Application.RequestHandlers.Queries.Hotel.Get;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using HotelService.Application.RequestHandlers.Commands.Room.Create;
 
 namespace HotelService.API.Controllers
 {

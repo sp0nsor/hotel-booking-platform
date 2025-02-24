@@ -2,7 +2,6 @@
 using HotelService.Application.RequestHandlers.Commands.Room.Create;
 using HotelService.Application.RequestHandlers.Commands.Room.Delete;
 using HotelService.Application.RequestHandlers.Commands.Room.Update;
-using HotelService.Application.RequestHandlers.Queries.Hotel.GetById;
 using HotelService.Application.RequestHandlers.Queries.Room.Get;
 using HotelService.Application.RequestHandlers.Queries.Room.GetById;
 using MediatR;
@@ -47,23 +46,24 @@ namespace HotelService.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetHotelRooms(
             [FromRoute] Guid hotelId,
+            [FromQuery] int PageIndex,
+            [FromQuery] int PageSize, 
             CancellationToken cancellationToken)
         {
-            var query = new GetRoomsQuery(hotelId);
+            var query = new GetRoomsQuery(hotelId, PageIndex, PageSize);
 
             var result = await mediator.Send(query, cancellationToken);
 
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Error);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetRoomById(
+            [FromRoute] Guid hotelId,
             [FromRoute] Guid id,
             CancellationToken cancellationToken)
         {
-            var query = new GetRoomByIdQuery(id);
+            var query = new GetRoomByIdQuery(id, hotelId);
 
             var result = await mediator.Send(query, cancellationToken);
 
