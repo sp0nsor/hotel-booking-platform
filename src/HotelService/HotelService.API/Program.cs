@@ -1,3 +1,4 @@
+using HotelService.API;
 using HotelService.Application;
 using HotelService.DataAccess;
 using System.Reflection;
@@ -11,16 +12,16 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-services.AddMediatR(x =>
-    x.RegisterServicesFromAssemblies(Assembly.Load("HotelService.Application")));
-
 services
+    .AddApi()
     .AddApplication()
     .AddDataAccess(configuration);
 
 services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
