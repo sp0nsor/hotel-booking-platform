@@ -5,6 +5,7 @@ namespace HotelService.Application.Interfaces
 {
     public interface IImageService
     {
-        Task<Result<string>> WriteImage(IFormFile image, CancellationToken cancellationToken);
+        Task<Result<string>> WriteImageAsync(IFormFile image, CancellationToken cancellationToken);
+        Task DeleteImageAsync(string imagePath, CancellationToken cancellationToken);
     }
 }

@@ -5,7 +5,7 @@ namespace HotelService.Core.Models
 {
     public class Room
     {
-        private List<DateRange> _bookedDates = [];
+        private List<BookedDates> _bookedDates = [];
 
         public Guid Id { get; }
         public Guid HotelId { get; }
@@ -14,7 +14,7 @@ namespace HotelService.Core.Models
         public int Number {  get; }
         public Image Image { get; }
         public Money Price { get; }
-        public IReadOnlyCollection<DateRange> BookedDates => _bookedDates;
+        public IReadOnlyCollection<BookedDates> BookedDates => _bookedDates;
 
         private Room(
             Guid id,
@@ -23,7 +23,8 @@ namespace HotelService.Core.Models
             int area, 
             int number,
             Money price,
-            Image image)
+            Image image,
+            List<BookedDates>? bookedDates = null)
         {
             Id = id;
             HotelId = hotelId;
@@ -32,6 +33,7 @@ namespace HotelService.Core.Models
             Number = number;
             Price = price;
             Image = image;
+            _bookedDates = bookedDates ?? [];
         }
 
         public static Result<Room> Create(
@@ -40,9 +42,10 @@ namespace HotelService.Core.Models
             int capacity,
             int area,
             int number,
-            int moneyAmount,
+            decimal moneyAmount,
             string currency,
-            string imageUrl)
+            string imageUrl, 
+            List<BookedDates>? bookedDates = null)
         {
             if (capacity < 0)
                 return Result.Failure<Room>("Capacity can not be negative");
@@ -68,40 +71,10 @@ namespace HotelService.Core.Models
                 area, 
                 number,
                 priceResult.Value, 
-                imageResult.Value);
+                imageResult.Value,
+                bookedDates);
 
             return Result.Success(room);
-        }
-
-        public Result AddBooking(DateTime startDate, DateTime endDate)
-        {
-            var dateRangeResult = DateRange.Create(startDate, endDate);
-            if(dateRangeResult.IsFailure)
-                return Result.Failure(dateRangeResult.Error);
-
-            if (_bookedDates.Any(range => range.Overlaps(dateRangeResult.Value)))
-                return Result.Failure("Date range overlaps with existing bookings");
-
-            _bookedDates.Add(dateRangeResult.Value);
-
-            return Result.Success();
-        }
-
-        public Result RemoveBooking(DateTime startDate, DateTime endDate)
-        {
-            var dateRangeResult = DateRange.Create(startDate, endDate);
-            if (dateRangeResult.IsFailure)
-                return Result.Failure(dateRangeResult.Error);
-
-            var existingRange = _bookedDates.FirstOrDefault(range => 
-                range == dateRangeResult.Value);
-
-            if (existingRange is null)
-                return Result.Failure("Booking not found");
-
-            _bookedDates.Remove(existingRange);
-
-            return Result.Success();
         }
     }
 }

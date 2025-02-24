@@ -10,5 +10,5 @@ namespace HotelService.Application.DTOs
         int Number,
         Image Image,
         Money Price,
-        List<DateRange> BookedDates);
+        List<BookedDatesDto> BookedDates);
 }

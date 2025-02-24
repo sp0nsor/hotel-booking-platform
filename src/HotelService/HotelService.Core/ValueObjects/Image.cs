@@ -4,26 +4,26 @@ namespace HotelService.Core.ValueObjects
 {
     public class Image : ValueObject
     {
-        public string Url { get; }
+        public string Value { get; }
 
-        private Image(string url)
+        private Image(string value)
         {
-            Url = url;
+            Value = value;
         }
 
-        public static Result<Image> Create(string url)
+        public static Result<Image> Create(string value)
         {
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(value))
                 return Result.Failure<Image>("Image url can not be null or empty");
 
-            var image = new Image(url);
+            var image = new Image(value);
 
             return Result.Success(image);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return Url;
+            yield return Value;
         }
     }
 }

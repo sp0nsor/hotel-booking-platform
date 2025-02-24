@@ -18,7 +18,7 @@ namespace HotelService.Application.Services
         private readonly static string StaticFilePath =
             Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles\\Images");
 
-        public async Task<Result<string>> WriteImage(
+        public async Task<Result<string>> WriteImageAsync(
             IFormFile image,
             CancellationToken cancellationToken)
         {
@@ -43,9 +43,26 @@ namespace HotelService.Application.Services
             }
             catch (Exception ex)
             {
-                return Result.Failure<string>($"Error when creating file: {ex.Message}");
+                throw new Exception($"Error when creating file {ex.Message}");
             }
 
+        }
+
+        public async Task DeleteImageAsync(
+            string imagePath,
+            CancellationToken cancellationToken)
+        {
+            if (!File.Exists(imagePath))
+                throw new Exception("Invalid file path");
+
+            try
+            {
+                await Task.Run(() => File.Delete(imagePath), cancellationToken);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Error when deleting file: {ex.Message}");
+            }
         }
     }
 }

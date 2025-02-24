@@ -17,12 +17,12 @@ namespace HotelService.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDateEntity", b =>
+            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDatesEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,10 +123,10 @@ namespace HotelService.DataAccess.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDateEntity", b =>
+            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDatesEntity", b =>
                 {
                     b.HasOne("HotelService.DataAccess.Entities.RoomEntity", null)
-                        .WithMany("BookedDateEntities")
+                        .WithMany("BookedDates")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -148,7 +148,7 @@ namespace HotelService.DataAccess.Migrations
 
             modelBuilder.Entity("HotelService.DataAccess.Entities.RoomEntity", b =>
                 {
-                    b.Navigation("BookedDateEntities");
+                    b.Navigation("BookedDates");
                 });
 #pragma warning restore 612, 618
         }

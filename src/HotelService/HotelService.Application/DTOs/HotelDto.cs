@@ -9,6 +9,6 @@ namespace HotelService.Application.DTOs
         Image Image,
         PhoneNumber PhoneNumber,
         Address Address,
-        PriceCategory Category,
+        Category Category,
         List<RoomDto> Rooms);
 }

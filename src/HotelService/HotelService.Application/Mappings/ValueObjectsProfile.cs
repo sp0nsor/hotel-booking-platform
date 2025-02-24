@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using HotelService.Application.DTOs;
+using HotelService.Core.Models;
 using HotelService.Core.ValueObjects;
 
 namespace HotelService.Application.Mappings
@@ -10,8 +12,7 @@ namespace HotelService.Application.Mappings
             CreateMap<Image, Image>();
             CreateMap<PhoneNumber, PhoneNumber>();
             CreateMap<Address, Address>();
-            CreateMap<PriceCategory, PriceCategory>();
-            CreateMap<DateRange, DateRange>();
+            CreateMap<Category, Category>();
             CreateMap<Money, Money>();
         }
     }
