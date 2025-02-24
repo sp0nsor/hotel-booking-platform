@@ -36,6 +36,8 @@ namespace HotelService.DataAccess.Configurations
                 .WithOne()
                 .HasForeignKey(b => b.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(r => r.HotelId);
         }
     }
 }
