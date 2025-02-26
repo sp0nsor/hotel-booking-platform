@@ -23,6 +23,7 @@ namespace HotelService.Application.Services
             CancellationToken cancellationToken)
         {
             var fileExtention = Path.GetExtension(image.FileName).ToLowerInvariant();
+
             if (!AllowedExtantions.Contains(fileExtention))
                 return Result.Failure<string>("Unsupported image format");
 

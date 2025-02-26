@@ -1,6 +1,4 @@
-﻿using HotelService.Core.ValueObjects;
-
-namespace HotelService.Application.DTOs
+﻿namespace HotelService.Application.DTOs
 {
     public record RoomDto(
         Guid Id,
@@ -8,7 +6,8 @@ namespace HotelService.Application.DTOs
         int Capacity,
         int Area,
         int Number,
-        Image Image,
-        Money Price,
+        string ImageUrl,
+        decimal MoneyAmount,
+        string Currency,
         List<BookedDatesDto> BookedDates);
 }

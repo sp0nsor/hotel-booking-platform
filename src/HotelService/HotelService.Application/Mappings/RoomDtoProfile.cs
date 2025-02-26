@@ -9,13 +9,17 @@ namespace HotelService.Application.Mappings
         public RoomDtoProfile()
         {
             CreateMap<Room, RoomDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Capacity))
-                .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area))
-                .ForMember(dest => dest.Number, opt => opt.MapFrom(src => src.Number))
-                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
-                .ForMember(dest => dest.BookedDates, opt => opt.MapFrom(src => src.BookedDates));
+                .ConstructUsing((src, ctx) => new RoomDto(
+                    src.Id,
+                    src.HotelId,
+                    src.Capacity,
+                    src.Area,
+                    src.Number,
+                    src.Image.Value,
+                    src.Price.Amount,
+                    src.Price.Currency,
+                    ctx.Mapper.Map<List<BookedDatesDto>>(src.BookedDates)
+                ));
         }
     }
 }
