@@ -3,7 +3,6 @@ using CSharpFunctionalExtensions;
 using HotelService.Application.DTOs;
 using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
-using HotelService.Core.ValueObjects;
 using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Hotel.GetById

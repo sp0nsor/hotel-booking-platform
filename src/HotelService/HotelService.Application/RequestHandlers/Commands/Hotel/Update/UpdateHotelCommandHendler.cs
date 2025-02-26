@@ -60,10 +60,10 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
 
             await hotelRepository.UpdateAsync(createHotelResult.Value, cancellationToken);
 
+            await deleteOldImageTask;
+
             var cachedKey = $"hotel_{request.Id}";
             await cacheService.DeleteAsync(cachedKey);
-
-            await deleteOldImageTask;
 
             return Result.Success();
         }

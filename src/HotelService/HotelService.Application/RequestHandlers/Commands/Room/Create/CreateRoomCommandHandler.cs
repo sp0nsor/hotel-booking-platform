@@ -32,10 +32,12 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
 
             var writeImageResult = await imageService
                 .WriteImageAsync(request.Image, cancellationToken);
+
             if(writeImageResult.IsFailure)
                 return Result.Failure(writeImageResult.Error);
 
             var hotel = await getHotelTask;
+
             if (hotel is null)
             {
                 await imageService.DeleteImageAsync(
@@ -46,6 +48,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
             }
 
             var existRoom = hotel.Rooms?.FirstOrDefault(r => r.Number == request.Number);
+
             if (existRoom != null)
             {
                 await imageService.DeleteImageAsync(
