@@ -12,11 +12,11 @@ namespace HotelService.Application
             this IServiceCollection services)
         {
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IRedisCacheService, RedisCacheService>();
 
             services.AddAutoMapper(typeof(HotelDtoProfile));
             services.AddAutoMapper(typeof(RoomDto));
             services.AddAutoMapper(typeof(BookedDateDtoProfile));
-            services.AddAutoMapper(typeof(ValueObjectsProfile));
 
             return services;
         }

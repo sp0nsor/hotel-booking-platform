@@ -8,12 +8,15 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
     public class UpdateHotelCommandHendler : IRequestHandler<UpdateHotelCommand, Result>
     {
         private readonly IImageService imageService;
+        private readonly IRedisCacheService cacheService;
         private readonly IRepository<Core.Models.Hotel> hotelRepository;
 
         public UpdateHotelCommandHendler(
+            IRedisCacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository,
             IImageService imageService)
         {
+            this.cacheService = cacheService;
             this.hotelRepository = hotelRepository;
             this.imageService = imageService;
         }
@@ -56,6 +59,9 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
                 return Result.Failure(createHotelResult.Error);
 
             await hotelRepository.UpdateAsync(createHotelResult.Value, cancellationToken);
+
+            var cachedKey = $"hotel_{request.Id}";
+            await cacheService.DeleteAsync(cachedKey);
 
             await deleteOldImageTask;
 

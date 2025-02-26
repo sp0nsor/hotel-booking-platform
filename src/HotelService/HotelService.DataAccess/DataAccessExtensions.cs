@@ -20,6 +20,12 @@ namespace HotelService.DataAccess
                 options.UseNpgsql(configuration.GetConnectionString(nameof(HotelDbContext)));
             });
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("Redis");
+                options.InstanceName = "local";
+            });
+
             services.AddScoped<IRepository<Hotel>, Repository<Hotel, HotelEntity>>();
             services.AddScoped<IRepository<Room>, Repository<Room, RoomEntity>>();
             services.AddScoped<IRoomRepository, RoomRepository>();

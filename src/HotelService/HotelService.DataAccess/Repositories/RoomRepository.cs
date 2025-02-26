@@ -3,6 +3,7 @@ using HotelService.Core.Models;
 using HotelService.Core.Abstractions;
 using HotelService.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+
 namespace HotelService.DataAccess.Repositories
 {
     public class RoomRepository : Repository<Room, RoomEntity>, IRoomRepository
