@@ -16,7 +16,7 @@ namespace HotelService.Application.Services
         private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
         private readonly static string StaticFilePath =
-            Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles\\Images");
+            Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles");
 
         public async Task<Result<string>> WriteImageAsync(
             IFormFile image,
@@ -29,6 +29,9 @@ namespace HotelService.Application.Services
 
             if (image.Length > MaxFileSize)
                 return Result.Failure<string>("Image size can not be more then 5 MB");
+
+            if (!Directory.Exists(StaticFilePath))
+                Directory.CreateDirectory(StaticFilePath);
 
             var fileName = Guid.NewGuid().ToString() + fileExtention;
             var fullPath = Path.Combine(StaticFilePath, fileName);

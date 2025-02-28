@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService.Application", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.API", "src\BookingService\BookingService.API\BookingService.API.csproj", "{67053F12-8B59-4454-83D2-C28115F3D809}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{6A44D63D-87BA-445F-BD22-2CE1325DEEC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{67053F12-8B59-4454-83D2-C28115F3D809}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67053F12-8B59-4454-83D2-C28115F3D809}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67053F12-8B59-4454-83D2-C28115F3D809}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A44D63D-87BA-445F-BD22-2CE1325DEEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A44D63D-87BA-445F-BD22-2CE1325DEEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A44D63D-87BA-445F-BD22-2CE1325DEEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A44D63D-87BA-445F-BD22-2CE1325DEEC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,8 +30,4 @@
     <ProjectReference Include="..\HotelService.DataAccess\HotelService.DataAccess.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="StaticFiles\Images\" />
-  </ItemGroup>
-
 </Project>

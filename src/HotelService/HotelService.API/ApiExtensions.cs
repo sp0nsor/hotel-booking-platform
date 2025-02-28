@@ -1,4 +1,6 @@
 ﻿using HotelService.API.ExceptionHandling;
+using HotelService.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace HotelService.API
@@ -18,6 +20,16 @@ namespace HotelService.API
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
             return services;
+        }
+
+        public static void ApplyMigrations(this IApplicationBuilder app)
+        {
+            using IServiceScope scope = app.ApplicationServices.CreateScope();
+
+            using HotelDbContext dbContext = 
+                scope.ServiceProvider.GetRequiredService<HotelDbContext>();
+
+            dbContext.Database.Migrate();
         }
     }
 }
