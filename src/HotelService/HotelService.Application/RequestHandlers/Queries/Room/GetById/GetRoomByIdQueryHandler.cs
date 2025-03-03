@@ -7,20 +7,21 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
 {
-    public class GetRoomdQueryHandler : IRequestHandler<GetRoomByIdQuery, Result<RoomDto>>
+    public class GetRoomByIdQueryHandler
+        : IRequestHandler<GetRoomByIdQuery, Result<RoomDto>>
     {
-        private readonly IMapper mapper;
-        private readonly IRedisCacheService cacheService;
-        private readonly IRoomRepository roomRepository;
+        private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
+        private readonly IRoomRepository _roomRepository;
 
-        public GetRoomdQueryHandler(
+        public GetRoomByIdQueryHandler(
             IMapper mapper,
-            IRedisCacheService cacheService,
+            ICacheService cacheService,
             IRoomRepository roomRepository)
         {
-            this.mapper = mapper;
-            this.cacheService = cacheService;
-            this.roomRepository = roomRepository;
+            _mapper = mapper;
+            _cacheService = cacheService;
+            _roomRepository = roomRepository;
         }
 
         public async Task<Result<RoomDto>> Handle(
@@ -28,12 +29,14 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
             CancellationToken cancellationToken)
         {
             var cachedKey = $"room_{request.Id}";
-            var cachedRoom = await cacheService.GetAsync<RoomDto>(cachedKey);
+            var cachedRoom = await _cacheService.GetAsync<RoomDto>(
+                cachedKey,
+                cancellationToken);
 
             if(cachedRoom != null)
                 return Result.Success(cachedRoom);
 
-            var room = await roomRepository.GetByIdAsync(
+            var room = await _roomRepository.GetByIdAsync(
                 request.Id,
                 request.HotelId,
                 cancellationToken);
@@ -41,11 +44,12 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
             if (room is null)
                 return Result.Failure<RoomDto>("Room not found");
 
-            var roomDto = mapper.Map<RoomDto>(room);
+            var roomDto = _mapper.Map<RoomDto>(room);
 
-            await cacheService.SetAsync(
+            await _cacheService.SetAsync(
                 cachedKey, 
                 roomDto,
+                cancellationToken,
                 TimeSpan.FromDays(1));
             
             return Result.Success(roomDto);

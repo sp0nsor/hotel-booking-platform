@@ -1,42 +1,55 @@
-﻿using HotelService.Application.Interfaces;
+﻿using CSharpFunctionalExtensions;
+using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
 using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Commands.Hotel.Delete
 {
-    public class DeleteHotelCommandHandler : IRequestHandler<DeleteHotelCommand>
+    public class DeleteHotelCommandHandler 
+        : IRequestHandler<DeleteHotelCommand, Result>
     {
-        private readonly IImageService imageService;
-        private readonly IRedisCacheService cacheService;
-        private readonly IRepository<Core.Models.Hotel> hotelRepository;
+        private readonly IImageService _imageService;
+        private readonly ICacheService _cacheService;
+        private readonly IRepository<Core.Models.Hotel> _hotelRepository;
 
         public DeleteHotelCommandHandler(
             IImageService imageService,
-            IRedisCacheService cacheService,
+            ICacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository)
         {
-            this.imageService = imageService;
-            this.cacheService = cacheService;
-            this.hotelRepository = hotelRepository;
+            _imageService = imageService;
+            _cacheService = cacheService;
+            _hotelRepository = hotelRepository;
         }
 
-        public async Task Handle(
+        public async Task<Result> Handle(
             DeleteHotelCommand request,
             CancellationToken cancellationToken)
         {
-            var hotel = await hotelRepository.GetByIdAsync(
+            var hotel = await _hotelRepository.GetByIdAsync(
                 request.Id,
                 cancellationToken);
 
             if (hotel is null)
-                return;
-
-            await imageService.DeleteImageAsync(hotel.Image.Value, cancellationToken);
-
-            await hotelRepository.DeleteAsync(hotel, cancellationToken);
+                return Result.Failure("Hotel not found");
 
             var cachedKey = $"hotel_{request.Id}";
-            await cacheService.DeleteAsync(cachedKey);
+
+            var deleteImageTask = _imageService.DeleteImageAsync(
+                hotel.Image.Value, 
+                cancellationToken);
+
+            var deleteHotelTask = _hotelRepository.DeleteAsync(
+                hotel, 
+                cancellationToken);
+
+            var deleteCacheTask =  _cacheService.DeleteAsync(
+                cachedKey,
+                cancellationToken);
+
+            await Task.WhenAll(deleteImageTask, deleteHotelTask, deleteCacheTask);
+
+            return Result.Success();
         }
     }
 }

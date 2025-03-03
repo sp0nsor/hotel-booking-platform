@@ -13,14 +13,14 @@ namespace HotelService.Core.ValueObjects
                 "BYN",
             ];
 
-        public decimal Amount { get; }
-        public string Currency { get; }
-
         private Money(decimal amount, string currency)
         {
             Amount = amount;
             Currency = currency;
         }
+
+        public decimal Amount { get; }
+        public string Currency { get; }
 
         public static Result<Money> Create(decimal amount, string currency)
         {

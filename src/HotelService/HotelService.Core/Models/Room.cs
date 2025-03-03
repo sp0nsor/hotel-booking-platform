@@ -5,26 +5,17 @@ namespace HotelService.Core.Models
 {
     public class Room
     {
-        private List<BookedDates> _bookedDates = [];
-
-        public Guid Id { get; }
-        public Guid HotelId { get; }
-        public int Capacity { get; }
-        public int Area { get; }
-        public int Number {  get; }
-        public Image Image { get; }
-        public Money Price { get; }
-        public IReadOnlyCollection<BookedDates> BookedDates => _bookedDates;
+        private List<BookingPeriod> _bookingPeriods = [];
 
         private Room(
             Guid id,
             Guid hotelId,
             int capacity,
-            int area, 
+            int area,
             int number,
             Money price,
             Image image,
-            List<BookedDates>? bookedDates = null)
+            List<BookingPeriod>? bookingPeriods = null)
         {
             Id = id;
             HotelId = hotelId;
@@ -33,8 +24,17 @@ namespace HotelService.Core.Models
             Number = number;
             Price = price;
             Image = image;
-            _bookedDates = bookedDates ?? [];
+            _bookingPeriods = bookingPeriods ?? [];
         }
+
+        public Guid Id { get; }
+        public Guid HotelId { get; }
+        public int Capacity { get; }
+        public int Area { get; }
+        public int Number {  get; }
+        public Image Image { get; }
+        public Money Price { get; }
+        public IReadOnlyCollection<BookingPeriod> BookingPeriods => _bookingPeriods;
 
         public static Result<Room> Create(
             Guid id,
@@ -45,7 +45,7 @@ namespace HotelService.Core.Models
             decimal moneyAmount,
             string currency,
             string imageUrl, 
-            List<BookedDates>? bookedDates = null)
+            List<BookingPeriod>? bookingPeriods = null)
         {
             if (capacity < 0)
                 return Result.Failure<Room>("Capacity can not be negative");
@@ -72,7 +72,7 @@ namespace HotelService.Core.Models
                 number,
                 priceResult.Value, 
                 imageResult.Value,
-                bookedDates);
+                bookingPeriods);
 
             return Result.Success(room);
         }

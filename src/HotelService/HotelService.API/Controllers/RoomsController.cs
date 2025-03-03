@@ -1,4 +1,5 @@
-﻿using HotelService.API.Contracts;
+﻿using AutoMapper;
+using HotelService.API.Contracts.Rooms;
 using HotelService.Application.RequestHandlers.Commands.Room.Create;
 using HotelService.Application.RequestHandlers.Commands.Room.Delete;
 using HotelService.Application.RequestHandlers.Commands.Room.Update;
@@ -10,37 +11,34 @@ using Microsoft.AspNetCore.Mvc;
 namespace HotelService.API.Controllers
 {
     [ApiController]
-    [Route("hotels/{hotelId}/rooms")]
+    [Route("api/hotels/{hotelId}/rooms")]
     public class RoomsController : ControllerBase
     {
-        private readonly IMediator mediator;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public RoomsController(IMediator mediator)
+        public RoomsController(
+            IMediator mediator, 
+            IMapper mapper)
         {
-            this.mediator = mediator;
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpPost]
         public async Task<ActionResult> AddRoomToHotel(
             [FromRoute] Guid hotelId,
-            [FromForm] CreateRoomRequest roomRequest,
+            [FromForm] CreateRoomRequest createRoomRequest,
             CancellationToken cancellationToken)
         {
-            var createRoomCommand = new CreateRoomCommand(
-                hotelId,
-                roomRequest.Area,
-                roomRequest.Number,
-                roomRequest.Capacity,
-                roomRequest.MoneyAmount,
-                roomRequest.Currency,
-                roomRequest.Image);
+            var createRoomCommand = _mapper.Map<CreateRoomCommand>(createRoomRequest);
+            createRoomCommand.HotelId = hotelId;
 
-            var result = await mediator.Send(createRoomCommand, cancellationToken);
+            var result = await _mediator.Send(createRoomCommand, cancellationToken);
 
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Ok();
+            return result.IsSuccess 
+                ? Ok()
+                : BadRequest(result.Error);
         }
 
         [HttpGet]
@@ -52,7 +50,7 @@ namespace HotelService.API.Controllers
         {
             var query = new GetRoomsQuery(hotelId, PageIndex, PageSize);
 
-            var result = await mediator.Send(query, cancellationToken);
+            var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(result);
         }
@@ -65,7 +63,7 @@ namespace HotelService.API.Controllers
         {
             var query = new GetRoomByIdQuery(id, hotelId);
 
-            var result = await mediator.Send(query, cancellationToken);
+            var result = await _mediator.Send(query, cancellationToken);
 
             return result.IsSuccess
                 ? Ok(result.Value)
@@ -76,20 +74,14 @@ namespace HotelService.API.Controllers
         public async Task<ActionResult> UpdateRoom(
             [FromRoute] Guid hotelId,
             [FromRoute] Guid id,
-            [FromForm] UpdateRoomRequest request,
+            [FromForm] UpdateRoomRequest updateRoomRequest,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateRoomCommand(
-                id,
-                hotelId,
-                request.Area,
-                request.Number,
-                request.Capacity,
-                request.MoneyAmount,
-                request.Currency,
-                request.Image);
+            var updateRoomCommand = _mapper.Map<UpdateRoomCommand>(updateRoomRequest);
+            updateRoomCommand.HotelId = hotelId;
+            updateRoomCommand.Id = id;
 
-            var result = await mediator.Send(command, cancellationToken);
+            var result = await _mediator.Send(updateRoomCommand, cancellationToken);
 
             return result.IsSuccess
                 ? Ok()
@@ -99,13 +91,16 @@ namespace HotelService.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteRoom(
             [FromRoute] Guid id,
+            [FromRoute] Guid hotelId,
             CancellationToken cancellationToken)
         {
-            var command = new DeleteRoomCommand(id);
+            var command = new DeleteRoomCommand(id, hotelId);
 
-            await mediator.Send(command, cancellationToken);
+            var result = await _mediator.Send(command, cancellationToken);
 
-            return NoContent();
+            return result.IsSuccess
+                ? Ok()
+                : BadRequest(result.Error);
         }
     }
 }

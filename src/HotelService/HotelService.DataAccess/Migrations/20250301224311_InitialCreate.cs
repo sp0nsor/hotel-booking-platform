@@ -55,7 +55,7 @@ namespace HotelService.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookedDates",
+                name: "BookingPeriods",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -65,9 +65,9 @@ namespace HotelService.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookedDates", x => x.Id);
+                    table.PrimaryKey("PK_BookingPeriods", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BookedDates_Rooms_RoomId",
+                        name: "FK_BookingPeriods_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
                         principalColumn: "Id",
@@ -75,8 +75,8 @@ namespace HotelService.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookedDates_RoomId",
-                table: "BookedDates",
+                name: "IX_BookingPeriods_RoomId",
+                table: "BookingPeriods",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
@@ -89,7 +89,7 @@ namespace HotelService.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BookedDates");
+                name: "BookingPeriods");
 
             migrationBuilder.DropTable(
                 name: "Rooms");

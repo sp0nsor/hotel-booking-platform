@@ -1,4 +1,4 @@
-﻿namespace HotelService.API.Contracts
+﻿namespace HotelService.API.Contracts.Rooms
 {
     public record UpdateRoomRequest(
         int Area,
@@ -6,5 +6,5 @@
         int Capacity,
         decimal MoneyAmount,
         string Currency,
-        IFormFile Image);
+        IFormFile? Image = null);
 }

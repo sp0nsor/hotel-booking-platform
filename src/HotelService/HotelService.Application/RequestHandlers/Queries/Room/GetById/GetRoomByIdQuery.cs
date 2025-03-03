@@ -4,5 +4,10 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
 {
-    public record GetRoomByIdQuery(Guid Id, Guid HotelId) : IRequest<Result<RoomDto>>;
+    public class GetRoomByIdQuery(Guid Id, Guid HotelId)
+        : IRequest<Result<RoomDto>>
+    {
+        public Guid Id { get; set; } = Id;
+        public Guid HotelId { get; set; } = HotelId;
+    }
 }

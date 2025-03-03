@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Create
 {
-    public record CreateRoomCommand(
-        Guid HotelId,
-        int Area,
-        int Number,
-        int Capacity,
-        decimal MoneyAmount,
-        string Currency,
-        IFormFile Image) : IRequest<Result>;
+    public class CreateRoomCommand : IRequest<Result>
+    {
+        public Guid HotelId { get; set; }
+        public int Area { get; set; }
+        public int Number { get; set; }
+        public int Capacity { get; set; }
+        public decimal MoneyAmount { get; set; }
+        public string Currency { get; set; }
+        public IFormFile Image { get; set; }
+    }
 }

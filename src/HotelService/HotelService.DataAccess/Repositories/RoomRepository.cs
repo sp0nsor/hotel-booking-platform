@@ -17,15 +17,13 @@ namespace HotelService.DataAccess.Repositories
             Guid hotelId,
             CancellationToken cancellationToken)
         {
-            var roomEntity = await dbSet
+            var roomEntity = await _dbSet
                 .AsNoTracking()
                 .Where(r => r.Id == id && r.HotelId == hotelId)
-                .Include(r => r.BookedDates)
+                .Include(r => r.BookingPeriods)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var room = mapper.Map<Room>(roomEntity);
-
-            return room;
+            return _mapper.Map<Room>(roomEntity);
         }
 
         public async Task<(IEnumerable<Room> Items, int TotalPages)> GetAllAsync(
@@ -34,13 +32,13 @@ namespace HotelService.DataAccess.Repositories
             int pageSize,
             CancellationToken cancellationToken)
         {
-            var totalCount = await dbSet
+            var totalCount = await _dbSet
                 .Where(r => r.HotelId == hotelId)
                 .CountAsync(cancellationToken);
 
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            var roomEntities = await dbSet
+            var roomEntities = await _dbSet
                 .AsNoTracking()
                 .Where(r => r.HotelId == hotelId)
                 .OrderBy(r => r.Number)
@@ -48,7 +46,7 @@ namespace HotelService.DataAccess.Repositories
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            var rooms = mapper.Map<List<Room>>(roomEntities);
+            var rooms = _mapper.Map<List<Room>>(roomEntities);
 
             return (rooms, totalPages);
         }

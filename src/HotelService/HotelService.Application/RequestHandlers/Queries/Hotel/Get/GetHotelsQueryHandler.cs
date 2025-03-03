@@ -5,29 +5,30 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Hotel.Get
 {
-    public class GetHotelsQueryHandler : IRequestHandler<GetHotelsQuery, PaginatedResult<HotelDto>>
+    public class GetHotelsQueryHandler 
+        : IRequestHandler<GetHotelsQuery, PaginatedResult<HotelDto>>
     {
-        private readonly IMapper mapper;
-        private readonly IRepository<Core.Models.Hotel> hotelRepository;
+        private readonly IMapper _mapper;
+        private readonly IRepository<Core.Models.Hotel> _hotelRepository;
 
         public GetHotelsQueryHandler(
             IMapper mapper,
             IRepository<Core.Models.Hotel> hotelRepository)
         {
-            this.mapper = mapper;
-            this.hotelRepository = hotelRepository;
+            _mapper = mapper;
+            _hotelRepository = hotelRepository;
         }
 
         public async Task<PaginatedResult<HotelDto>> Handle(
             GetHotelsQuery request, 
             CancellationToken cancellationToken)
         {
-            var (items, totalPages) = await hotelRepository.GetAllAsync(
+            var (items, totalPages) = await _hotelRepository.GetAllAsync(
                 request.PageIndex,
                 request.PageSize,
                 cancellationToken);
 
-            var hotelDtos = mapper.Map<List<HotelDto>>(items);
+            var hotelDtos = _mapper.Map<List<HotelDto>>(items);
 
             var paginatedResult = new PaginatedResult<HotelDto>
             {

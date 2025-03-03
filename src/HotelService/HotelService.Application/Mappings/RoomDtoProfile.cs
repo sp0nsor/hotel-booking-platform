@@ -18,7 +18,7 @@ namespace HotelService.Application.Mappings
                     src.Image.Value,
                     src.Price.Amount,
                     src.Price.Currency,
-                    ctx.Mapper.Map<List<BookedDatesDto>>(src.BookedDates)
+                    ctx.Mapper.Map<List<BookedDatesDto>>(src.BookingPeriods)
                 ));
         }
     }

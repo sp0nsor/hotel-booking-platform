@@ -7,20 +7,21 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Queries.Hotel.GetById
 {
-    public class GetHotelByIdQueryHandler : IRequestHandler<GetHotelByIdQuery, Result<HotelDto>>
+    public class GetHotelByIdQueryHandler
+        : IRequestHandler<GetHotelByIdQuery, Result<HotelDto>>
     {
-        private readonly IMapper mapper;
-        private readonly IRedisCacheService cacheService;
-        private readonly IRepository<Core.Models.Hotel> hotelRepository;
+        private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
+        private readonly IRepository<Core.Models.Hotel> _hotelRepository;
 
         public GetHotelByIdQueryHandler(
             IMapper mapper,
-            IRedisCacheService cacheService,
+            ICacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository)
         {
-            this.mapper = mapper;
-            this.cacheService = cacheService;
-            this.hotelRepository = hotelRepository;
+            _mapper = mapper;
+            _cacheService = cacheService;
+            _hotelRepository = hotelRepository;
         }
 
         public async Task<Result<HotelDto>> Handle(
@@ -28,24 +29,28 @@ namespace HotelService.Application.RequestHandlers.Queries.Hotel.GetById
             CancellationToken cancellationToken)
         {
             var cachedKey = $"hotel_{request.Id}";
-            var cachedHotel = await cacheService.GetAsync<HotelDto>(cachedKey);
+
+            var cachedHotel = await _cacheService.GetAsync<HotelDto>(
+                cachedKey,
+                cancellationToken);
 
             if (cachedHotel != null)
                 return Result.Success(cachedHotel);
 
-            var hotel = await hotelRepository.GetByIdAsync(
-                request.Id, 
+            var hotel = await _hotelRepository.GetByIdAsync(
+                request.Id,
                 cancellationToken,
                 includeProperties: "Rooms");
 
             if (hotel is null)
                 return Result.Failure<HotelDto>("Hotel not found");
 
-            var hotelDto = mapper.Map<HotelDto>(hotel);
+            var hotelDto = _mapper.Map<HotelDto>(hotel);
 
-            await cacheService.SetAsync(
+            await _cacheService.SetAsync(
                 cachedKey,
                 hotelDto,
+                cancellationToken,
                 TimeSpan.FromDays(1));
 
             return Result.Success(hotelDto);

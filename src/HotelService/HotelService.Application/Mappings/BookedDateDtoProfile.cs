@@ -8,7 +8,7 @@ namespace HotelService.Application.Mappings
     {
         public BookedDateDtoProfile()
         {
-            CreateMap<BookedDates, BookedDatesDto>();
+            CreateMap<BookingPeriod, BookedDatesDto>();
         }
     }
 }

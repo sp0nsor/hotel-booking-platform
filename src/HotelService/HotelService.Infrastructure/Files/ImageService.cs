@@ -1,12 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using HotelService.Application.Interfaces;
+﻿using HotelService.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace HotelService.Application.Services
+namespace HotelService.Infrastructure.Files
 {
     public class ImageService : IImageService
     {
-        private static readonly string[] AllowedExtantions =
+        private static readonly string[] _allowedExtensions =
         {
             ".jpg",
             ".jpeg",
@@ -18,17 +17,18 @@ namespace HotelService.Application.Services
         private readonly static string StaticFilePath =
             Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles");
 
-        public async Task<Result<string>> WriteImageAsync(
+        public async Task<string> WriteImageAsync(
             IFormFile image,
             CancellationToken cancellationToken)
         {
+            Console.WriteLine(image.GetHashCode());
             var fileExtention = Path.GetExtension(image.FileName).ToLowerInvariant();
 
-            if (!AllowedExtantions.Contains(fileExtention))
-                return Result.Failure<string>("Unsupported image format");
+            if (!_allowedExtensions.Contains(fileExtention))
+                throw new Exception("Unsupported image format");
 
             if (image.Length > MaxFileSize)
-                return Result.Failure<string>("Image size can not be more then 5 MB");
+                throw new Exception("Image size can not be more then 5 MB");
 
             if (!Directory.Exists(StaticFilePath))
                 Directory.CreateDirectory(StaticFilePath);
@@ -43,7 +43,7 @@ namespace HotelService.Application.Services
                     await image.CopyToAsync(stream, cancellationToken);
                 }
 
-                return Result.Success(fullPath);
+                return fullPath;
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace HotelService.Application.Services
             {
                 await Task.Run(() => File.Delete(imagePath), cancellationToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Error when deleting file: {ex.Message}");
             }
