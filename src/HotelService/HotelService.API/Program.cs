@@ -1,6 +1,7 @@
-using HotelService.API;
-using HotelService.Application;
-using HotelService.DataAccess;
+using HotelService.API.Extensions;
+using HotelService.Application.Extensions;
+using HotelService.DataAccess.Extensions;
+using HotelService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +16,24 @@ services.AddSwaggerGen();
 services
     .AddApi()
     .AddApplication()
+    .AddInfrastructure()
     .AddDataAccess(configuration);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 app.UseExceptionHandler();
 
@@ -29,6 +43,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();

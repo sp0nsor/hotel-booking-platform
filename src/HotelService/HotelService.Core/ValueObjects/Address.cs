@@ -4,10 +4,6 @@ namespace HotelService.Core.ValueObjects
 {
     public class Address : ValueObject
     {
-        public string Country { get; }
-        public string City { get; }
-        public string Street { get; }
-
         private Address(
             string country,
             string city,
@@ -17,6 +13,10 @@ namespace HotelService.Core.ValueObjects
             City = city;
             Street = street;
         }
+
+        public string Country { get; }
+        public string City { get; }
+        public string Street { get; }
 
         public static Result<Address> Create(
             string country,

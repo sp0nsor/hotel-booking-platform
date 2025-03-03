@@ -7,15 +7,6 @@ namespace HotelService.Core.Models
     {
         private List<Room> _rooms = [];
 
-        public Guid Id { get; }
-        public string Name { get; }
-        public string Description { get; }
-        public Image Image { get; }
-        public PhoneNumber PhoneNumber { get; }
-        public Address Address { get; }
-        public Category Category { get; }
-        public IReadOnlyCollection<Room>? Rooms => _rooms;
-
         private Hotel(
             Guid id,
             string name,
@@ -35,6 +26,15 @@ namespace HotelService.Core.Models
             Image = image;
             _rooms = rooms ?? [];
         }
+
+        public Guid Id { get; }
+        public string Name { get; }
+        public string Description { get; }
+        public Image Image { get; }
+        public PhoneNumber PhoneNumber { get; }
+        public Address Address { get; }
+        public Category Category { get; }
+        public IReadOnlyCollection<Room>? Rooms => _rooms;
 
         public static Result<Hotel> Create(
             Guid id,

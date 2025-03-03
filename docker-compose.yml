@@ -1,0 +1,47 @@
+version: '3.4'
+
+networks:
+  hotel-booking-dev:
+    driver: bridge
+
+services:
+  hotelservice.api:
+    container_name: hotel-service
+    build:
+      context: .
+      dockerfile: src/HotelService/HotelService.API/Dockerfile
+    ports:
+      - "5000:8080"
+    networks:
+      - hotel-booking-dev
+    depends_on:
+      - postgre_db
+      - redis
+
+  postgre_db:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: hotel-service
+    ports:
+      - "5432:5432"
+    networks:
+      - hotel-booking-dev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis-cache
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - hotel-booking-dev
+    volumes:
+      - redis-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:

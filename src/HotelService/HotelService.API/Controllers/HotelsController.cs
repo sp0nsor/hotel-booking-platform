@@ -6,26 +6,34 @@ using HotelService.Application.RequestHandlers.Commands.Hotel.Update;
 using HotelService.Application.RequestHandlers.Queries.Hotel.Get;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using HotelService.API.Contracts.Hotels;
+using AutoMapper;
 
 namespace HotelService.API.Controllers
 {
     [ApiController]
-    [Route("hotels")]
+    [Route("api/hotels")]
     public class HotelsController : ControllerBase
     {
-        private readonly IMediator mediator;
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public HotelsController(IMediator mediator)
+        public HotelsController(
+            IMapper mapper,
+            IMediator mediator)
         {
-            this.mediator = mediator;
+            _mapper = mapper;
+            _mediator = mediator;
         }
 
         [HttpPost]
         public async Task<ActionResult> CreateHotel(
-            [FromForm] CreateHotelCommand command,
+            [FromForm] CreateHotelRequest createHotelRequest,
             CancellationToken cancellationToken)
         {
-            var result = await mediator.Send(command, cancellationToken);
+            var createHotelCommand = _mapper.Map<CreateHotelCommand>(createHotelRequest);
+
+            var result = await _mediator.Send(createHotelCommand, cancellationToken);
 
             return result.IsSuccess
                 ? Ok()
@@ -34,10 +42,13 @@ namespace HotelService.API.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<HotelDto>>> GetHotels(
-            [FromQuery] GetHotelsQuery query,
+            [FromQuery] int PageIndex,
+            [FromQuery] int PageSize,
             CancellationToken cancellationToken)
         {
-            var hotelsPage = await mediator.Send(query, cancellationToken);
+            var query = new GetHotelsQuery(PageIndex, PageSize);
+
+            var hotelsPage = await _mediator.Send(query, cancellationToken);
 
             return Ok(hotelsPage);
         }
@@ -48,19 +59,24 @@ namespace HotelService.API.Controllers
                 CancellationToken cancellationToken)
         {
             var query = new GetHotelByIdQuery(id);
-            var result = await mediator.Send(query, cancellationToken);
+
+            var result = await _mediator.Send(query, cancellationToken);
 
             return result.IsSuccess
                 ? Ok(result.Value)
                 : BadRequest(result.Value);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<ActionResult> UpdateHotel(
-            [FromForm] UpdateHotelCommand command,
+            [FromRoute] Guid id,
+            [FromForm] UpdateHotelRequest updateHotelRequest,
             CancellationToken cancellationToken)
         {
-            var result = await mediator.Send(command, cancellationToken);
+            var updateHotelCommand = _mapper.Map<UpdateHotelCommand>(updateHotelRequest);
+            updateHotelCommand.Id = id;
+
+            var result = await _mediator.Send(updateHotelCommand, cancellationToken);
 
             return result.IsSuccess
                 ? Ok()
@@ -73,9 +89,12 @@ namespace HotelService.API.Controllers
             CancellationToken cancellationToken)
         {
             var command = new DeleteHotelCommand(id);
-            await mediator.Send(command, cancellationToken);
 
-            return NoContent();
+            var result = await _mediator.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? Ok()
+                : BadRequest(result.Error);
         }
     }
 }

@@ -4,18 +4,18 @@ namespace HotelService.Core.ValueObjects
 {
     public class Category : ValueObject
     {
-        public static readonly Category Low = new(nameof(Low));
-        public static readonly Category High = new(nameof(High));
-        public static readonly Category Medium = new(nameof(Medium));
-
-        private static readonly Category[] _all = { Low, High, Medium };
-
-        public string Value { get; }
-
         private Category(string value)
         {
             Value = value;
         }
+
+        public static readonly Category Low = new(nameof(Low));
+        public static readonly Category High = new(nameof(High));
+        public static readonly Category Medium = new(nameof(Medium));
+
+        private static readonly Category[] existingCategories = { Low, High, Medium };
+
+        public string Value { get; }
 
         public static Result<Category> Create(string value)
         {
@@ -24,7 +24,7 @@ namespace HotelService.Core.ValueObjects
 
             var category = value.Trim().ToLower();
 
-            if (!_all.Any(c => c.Value.ToLower() == category))
+            if (!existingCategories.Any(c => c.Value.ToLower() == category))
                 return Result.Failure<Category>("Invalid category type");
 
             return new Category(category);

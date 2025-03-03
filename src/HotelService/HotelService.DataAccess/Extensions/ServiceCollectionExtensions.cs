@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HotelService.DataAccess
+namespace HotelService.DataAccess.Extensions
 {
-    public static class DataAccessExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddDataAccess(
             this IServiceCollection services,
@@ -32,7 +32,7 @@ namespace HotelService.DataAccess
 
             services.AddAutoMapper(typeof(HotelProfile));
             services.AddAutoMapper(typeof(RoomProfile));
-            services.AddAutoMapper(typeof(BookedDatesEntity));
+            services.AddAutoMapper(typeof(BookingPeriodEntity));
 
             return services;
         }

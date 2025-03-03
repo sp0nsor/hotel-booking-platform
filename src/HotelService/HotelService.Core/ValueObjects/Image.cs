@@ -4,12 +4,12 @@ namespace HotelService.Core.ValueObjects
 {
     public class Image : ValueObject
     {
-        public string Value { get; }
-
         private Image(string value)
         {
             Value = value;
         }
+
+        public string Value { get; }
 
         public static Result<Image> Create(string value)
         {

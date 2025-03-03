@@ -5,58 +5,42 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Create
 {
-    public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, Result>
+    public class CreateRoomCommandHandler
+        : IRequestHandler<CreateRoomCommand, Result>
     {
-        private readonly IRepository<Core.Models.Room> roomRepository;
-        private readonly IRepository<Core.Models.Hotel> hotelRepository;
-        private readonly IImageService imageService;
+        private readonly IRepository<Core.Models.Room> _roomRepository;
+        private readonly IRepository<Core.Models.Hotel> _hotelRepository;
+        private readonly IImageService _imageService;
 
         public CreateRoomCommandHandler(
             IRepository<Core.Models.Room> roomRepository,
             IRepository<Core.Models.Hotel> hotelRepository,
             IImageService imageService)
         {
-            this.roomRepository = roomRepository;
-            this.hotelRepository = hotelRepository;
-            this.imageService = imageService;
+            _roomRepository = roomRepository;
+            _hotelRepository = hotelRepository;
+            _imageService = imageService;
         }
 
         public async Task<Result> Handle(
             CreateRoomCommand request,
             CancellationToken cancellationToken)
         {
-            var getHotelTask = hotelRepository.GetByIdAsync(
+            var hotel = await _hotelRepository.GetByIdAsync(
                 request.HotelId,
                 cancellationToken,
                 includeProperties: "Rooms");
 
-            var writeImageResult = await imageService
-                .WriteImageAsync(request.Image, cancellationToken);
-
-            if(writeImageResult.IsFailure)
-                return Result.Failure(writeImageResult.Error);
-
-            var hotel = await getHotelTask;
-
             if (hotel is null)
-            {
-                await imageService.DeleteImageAsync(
-                    writeImageResult.Value,
-                    cancellationToken);
-
                 return Result.Failure("Hotel not found");
-            }
 
-            var existRoom = hotel.Rooms?.FirstOrDefault(r => r.Number == request.Number);
+            var existingRoom = hotel.Rooms?.FirstOrDefault(r => r.Number == request.Number);
 
-            if (existRoom != null)
-            {
-                await imageService.DeleteImageAsync(
-                    writeImageResult.Value,
-                    cancellationToken);
-
+            if (existingRoom != null)
                 return Result.Failure("Room whith this number exist");
-            }
+
+            var imagePath = await _imageService
+                .WriteImageAsync(request.Image, cancellationToken);
 
             var createRoomResult = Core.Models.Room.Create(
                 Guid.NewGuid(),
@@ -66,12 +50,18 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Create
                 request.Number,
                 request.MoneyAmount,
                 request.Currency,
-                writeImageResult.Value);
+                imagePath);
 
             if(createRoomResult.IsFailure)
-                return Result.Failure(createRoomResult.Error);
+            {
+                await _imageService.DeleteImageAsync(
+                    imagePath,
+                    CancellationToken.None);
 
-            await roomRepository.AddAsync(
+                return Result.Failure(createRoomResult.Error);
+            }
+
+            await _roomRepository.AddAsync(
                 createRoomResult.Value,
                 cancellationToken);
 

@@ -5,44 +5,53 @@ using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Update
 {
-    public class UpdateRoomCommandHandler : IRequestHandler<UpdateRoomCommand, Result>
+    public class UpdateRoomCommandHandler 
+        : IRequestHandler<UpdateRoomCommand, Result>
     {
-        private readonly IImageService imageService;
-        private readonly IRedisCacheService cacheService;
-        private readonly IRepository<Core.Models.Hotel> hotelRepository;
-        private readonly IRepository<Core.Models.Room> roomRepository;
+        private readonly IImageService _imageService;
+        private readonly ICacheService _cacheService;
+        private readonly IRepository<Core.Models.Hotel> _hotelRepository;
+        private readonly IRepository<Core.Models.Room> _roomRepository;
 
         public UpdateRoomCommandHandler(
             IImageService imageService,
-            IRedisCacheService cacheService,
+            ICacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository,
             IRepository<Core.Models.Room> roomRepository)
         {
-            this.imageService = imageService;
-            this.cacheService = cacheService;
-            this.hotelRepository = hotelRepository;
-            this.roomRepository = roomRepository;
+            _imageService = imageService;
+            _cacheService = cacheService;
+            _hotelRepository = hotelRepository;
+            _roomRepository = roomRepository;
         }
 
         public async Task<Result> Handle(
             UpdateRoomCommand request, 
             CancellationToken cancellationToken)
         {
-            var existRoom = await roomRepository.GetByIdAsync(
+            var existRoom = await _roomRepository.GetByIdAsync(
                 request.Id,
                 cancellationToken);
 
             if (existRoom is null)
                 return Result.Failure("Room not found");
 
-            var deleteOldImageTask = imageService.DeleteImageAsync(
-                existRoom.Image.Value,
-                cancellationToken);
+            string imagePath;
 
-            var imageResult = await imageService.WriteImageAsync(request.Image, cancellationToken);
+            if(request.Image is null)
+            {
+                imagePath = existRoom.Image.Value;
+            }
+            else
+            {
+                imagePath = await _imageService.WriteImageAsync(
+                    request.Image, 
+                    cancellationToken);
 
-            if (imageResult.IsFailure)
-                return Result.Failure(imageResult.Error);
+                await _imageService.DeleteImageAsync(
+                    existRoom.Image.Value,
+                    cancellationToken);
+            }
 
             var roomResult = Core.Models.Room.Create(
                 request.Id,
@@ -52,17 +61,28 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                 request.Number,
                 request.MoneyAmount,
                 request.Currency,
-                imageResult.Value);
+                imagePath);
 
-            if(roomResult.IsFailure)
+            if (roomResult.IsFailure)
+            {
+                await _imageService.DeleteImageAsync(
+                    imagePath,
+                    CancellationToken.None);
+
                 return Result.Failure(roomResult.Error);
-
-            await roomRepository.UpdateAsync(roomResult.Value, cancellationToken);
-
-            await deleteOldImageTask;
+            }
 
             var cachedKey = $"room_{request.Id}";
-            await cacheService.DeleteAsync(cachedKey);
+
+            var deleteRoomTask = _roomRepository.UpdateAsync(
+                roomResult.Value, 
+                cancellationToken);
+
+            var deleteCacheTask = _cacheService.DeleteAsync(
+                cachedKey,
+                cancellationToken);
+
+            await Task.WhenAll(deleteCacheTask, deleteRoomTask);
 
             return Result.Success();
         }

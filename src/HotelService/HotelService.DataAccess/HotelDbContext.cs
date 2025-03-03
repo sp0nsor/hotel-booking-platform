@@ -10,7 +10,7 @@ namespace HotelService.DataAccess
 
         public DbSet<HotelEntity> Hotels { get; set; }
         public DbSet<RoomEntity> Rooms { get; set; }
-        public DbSet<BookedDatesEntity> BookedDates { get; set; }
+        public DbSet<BookingPeriodEntity> BookingPeriods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

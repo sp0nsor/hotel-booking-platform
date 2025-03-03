@@ -1,4 +1,4 @@
-﻿namespace HotelService.API.Contracts
+﻿namespace HotelService.API.Contracts.Rooms
 {
     public record CreateRoomRequest(
         int Capacity,

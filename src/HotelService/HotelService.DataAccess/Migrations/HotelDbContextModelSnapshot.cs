@@ -22,7 +22,7 @@ namespace HotelService.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDatesEntity", b =>
+            modelBuilder.Entity("HotelService.DataAccess.Entities.BookingPeriodEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace HotelService.DataAccess.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("BookedDates");
+                    b.ToTable("BookingPeriods");
                 });
 
             modelBuilder.Entity("HotelService.DataAccess.Entities.HotelEntity", b =>
@@ -123,10 +123,10 @@ namespace HotelService.DataAccess.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("HotelService.DataAccess.Entities.BookedDatesEntity", b =>
+            modelBuilder.Entity("HotelService.DataAccess.Entities.BookingPeriodEntity", b =>
                 {
                     b.HasOne("HotelService.DataAccess.Entities.RoomEntity", null)
-                        .WithMany("BookedDates")
+                        .WithMany("BookingPeriods")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -148,7 +148,7 @@ namespace HotelService.DataAccess.Migrations
 
             modelBuilder.Entity("HotelService.DataAccess.Entities.RoomEntity", b =>
                 {
-                    b.Navigation("BookedDates");
+                    b.Navigation("BookingPeriods");
                 });
 #pragma warning restore 612, 618
         }

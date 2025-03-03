@@ -1,46 +1,54 @@
-﻿using HotelService.Application.Interfaces;
+﻿using CSharpFunctionalExtensions;
+using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
 using MediatR;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Delete
 {
-    public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand>
+    public class DeleteRoomCommandHandler
+        : IRequestHandler<DeleteRoomCommand, Result>
     {
-        private readonly IRedisCacheService cacheService;
-        private readonly IImageService imageService;
-        private readonly IRepository<Core.Models.Room> roomRepository;
+        private readonly ICacheService _cacheService;
+        private readonly IImageService _imageService;
+        private readonly IRoomRepository _roomRepository;
 
         public DeleteRoomCommandHandler(
-            IRedisCacheService cacheService,
+            ICacheService cacheService,
             IImageService imageService,
-            IRepository<Core.Models.Room> roomRepository)
+            IRoomRepository roomRepository)
         {
-            this.cacheService = cacheService;
-            this.imageService = imageService;
-            this.roomRepository = roomRepository;
+            _cacheService = cacheService;
+            _imageService = imageService;
+            _roomRepository = roomRepository;
         }
 
-        public async Task Handle(
+        public async Task<Result> Handle(
             DeleteRoomCommand request,
             CancellationToken cancellationToken)
         {
-            var room = await roomRepository.GetByIdAsync(
+            var room = await _roomRepository.GetByIdAsync(
                 request.Id,
+                request.HotelId,
                 cancellationToken);
 
-            if(room is null)
-                return;
+            if (room is null)
+                return Result.Failure("Room not found");
 
-            var deleteRoomImageTask = imageService.DeleteImageAsync(
+            var cachedKey = $"room_{request.Id}";
+
+            var deleteImageTask = _imageService.DeleteImageAsync(
                 room.Image.Value,
                 cancellationToken);
 
-            await roomRepository.DeleteAsync(room, cancellationToken);
+            var deleteRoomTask = _roomRepository.DeleteAsync(room, cancellationToken);
 
-            await deleteRoomImageTask;
+            var deleteCacheTask = _cacheService.DeleteAsync(
+                cachedKey,
+                cancellationToken);
 
-            var cachedKey = $"room_{request.Id}";
-            await cacheService.DeleteAsync(cachedKey);
+            await Task.WhenAll(deleteRoomTask, deleteCacheTask, deleteImageTask);
+
+            return Result.Success();
         }
     }
 }

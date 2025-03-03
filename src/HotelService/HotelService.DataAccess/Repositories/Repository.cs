@@ -8,15 +8,15 @@ namespace HotelService.DataAccess.Repositories
         where TDomain : class
         where TEntity : class
     {
-        protected readonly DbContext context;
-        protected readonly DbSet<TEntity> dbSet;
-        protected readonly IMapper mapper;
+        protected readonly DbContext _context;
+        protected readonly DbSet<TEntity> _dbSet;
+        protected readonly IMapper _mapper;
 
         public Repository(HotelDbContext context, IMapper mapper)
         {
-            this.context = context;
-            dbSet = this.context.Set<TEntity>();
-            this.mapper = mapper;
+            _context = context;
+            _dbSet = _context.Set<TEntity>();
+            _mapper = mapper;
         }
 
         public virtual async Task<TDomain?> GetByIdAsync(
@@ -24,7 +24,7 @@ namespace HotelService.DataAccess.Repositories
             CancellationToken cancellationToken,
             params string[] includeProperties)
         {
-            var query = dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
 
             foreach (var includeProperty in includeProperties)
                 query = query.Include(includeProperty);
@@ -33,7 +33,7 @@ namespace HotelService.DataAccess.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, cancellationToken);
 
-            return entity != null ? mapper.Map<TDomain>(entity) : null;
+            return entity != null ? _mapper.Map<TDomain>(entity) : null;
         }
 
         public virtual async Task<(IEnumerable<TDomain> Items, int TotalPages)> GetAllAsync(
@@ -41,16 +41,16 @@ namespace HotelService.DataAccess.Repositories
             int pageSize,
             CancellationToken cancellationToken)
         {
-            var totalCount = await dbSet.CountAsync(cancellationToken);
+            var totalCount = await _dbSet.CountAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            var entities = await dbSet
+            var entities = await _dbSet
                 .AsNoTracking()
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            var items = mapper.Map<IEnumerable<TDomain>>(entities);
+            var items = _mapper.Map<IEnumerable<TDomain>>(entities);
 
             return (Items: items, TotalPages: totalPages);
         }
@@ -59,32 +59,33 @@ namespace HotelService.DataAccess.Repositories
             TDomain domain,
             CancellationToken cancellationToken)
         {
-            var entity = mapper.Map<TEntity>(domain);
-            await dbSet.AddAsync(entity, cancellationToken);
+            var entity = _mapper.Map<TEntity>(domain);
 
-            await context.SaveChangesAsync(cancellationToken);
+            await _dbSet.AddAsync(entity, cancellationToken);
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task UpdateAsync(
             TDomain domain,
             CancellationToken cancellationToken)
         {
-            var entity = mapper.Map<TEntity>(domain);
+            var entity = _mapper.Map<TEntity>(domain);
             
-            dbSet.Update(entity);
+            _dbSet.Update(entity);
 
-            await context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task DeleteAsync(
             TDomain domain,
             CancellationToken cancellationToken)
         {
-            var entity = mapper.Map<TEntity>(domain);
+            var entity = _mapper.Map<TEntity>(domain);
 
-            dbSet.Remove(entity);
+            _dbSet.Remove(entity);
 
-            await context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
