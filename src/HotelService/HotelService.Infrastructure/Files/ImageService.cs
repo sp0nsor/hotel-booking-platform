@@ -12,29 +12,28 @@ namespace HotelService.Infrastructure.Files
             ".png"
         };
 
-        private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
+        private readonly static long _maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-        private readonly static string StaticFilePath =
+        private readonly static string _staticFilePath =
             Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles");
 
         public async Task<string> WriteImageAsync(
             IFormFile image,
             CancellationToken cancellationToken)
         {
-            Console.WriteLine(image.GetHashCode());
             var fileExtention = Path.GetExtension(image.FileName).ToLowerInvariant();
 
             if (!_allowedExtensions.Contains(fileExtention))
                 throw new Exception("Unsupported image format");
 
-            if (image.Length > MaxFileSize)
+            if (image.Length > _maxFileSize)
                 throw new Exception("Image size can not be more then 5 MB");
 
-            if (!Directory.Exists(StaticFilePath))
-                Directory.CreateDirectory(StaticFilePath);
+            if (!Directory.Exists(_staticFilePath))
+                Directory.CreateDirectory(_staticFilePath);
 
             var fileName = Guid.NewGuid().ToString() + fileExtention;
-            var fullPath = Path.Combine(StaticFilePath, fileName);
+            var fullPath = Path.Combine(_staticFilePath, fileName);
 
             try
             {

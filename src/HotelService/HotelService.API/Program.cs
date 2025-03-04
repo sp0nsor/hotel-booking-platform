@@ -19,7 +19,7 @@ services
     .AddInfrastructure()
     .AddDataAccess(configuration);
 
-builder.Services.AddCors(options =>
+services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
     {
@@ -33,14 +33,13 @@ services.AddProblemDetails();
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
-
 app.UseExceptionHandler();
 
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("AllowAll");
     app.UseSwagger();
     app.UseSwaggerUI();
     app.ApplyMigrations();

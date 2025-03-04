@@ -72,11 +72,11 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                 return Result.Failure(roomResult.Error);
             }
 
-            var cachedKey = $"room_{request.Id}";
-
             var deleteRoomTask = _roomRepository.UpdateAsync(
                 roomResult.Value, 
                 cancellationToken);
+
+            var cachedKey = $"room_{request.Id}";
 
             var deleteCacheTask = _cacheService.DeleteAsync(
                 cachedKey,

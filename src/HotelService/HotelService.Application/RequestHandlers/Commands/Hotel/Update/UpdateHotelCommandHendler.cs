@@ -71,11 +71,11 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
                 return Result.Failure(createHotelResult.Error);
             }
 
-            var cachedKey = $"hotel_{request.Id}";
-
             var deleteHotelTask = _hotelRepository.UpdateAsync(
                 createHotelResult.Value,
                 cancellationToken);
+
+            var cachedKey = $"hotel_{request.Id}";
 
             var deleteCacheTask = _cacheService.DeleteAsync(
                 cachedKey,

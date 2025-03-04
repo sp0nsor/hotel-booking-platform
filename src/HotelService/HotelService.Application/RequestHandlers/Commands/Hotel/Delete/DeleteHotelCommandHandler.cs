@@ -33,8 +33,6 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Delete
             if (hotel is null)
                 return Result.Failure("Hotel not found");
 
-            var cachedKey = $"hotel_{request.Id}";
-
             var deleteImageTask = _imageService.DeleteImageAsync(
                 hotel.Image.Value, 
                 cancellationToken);
@@ -42,6 +40,8 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Delete
             var deleteHotelTask = _hotelRepository.DeleteAsync(
                 hotel, 
                 cancellationToken);
+
+            var cachedKey = $"hotel_{request.Id}";
 
             var deleteCacheTask =  _cacheService.DeleteAsync(
                 cachedKey,

@@ -29,6 +29,7 @@ namespace HotelService.Application.RequestHandlers.Queries.Room.GetById
             CancellationToken cancellationToken)
         {
             var cachedKey = $"room_{request.Id}";
+
             var cachedRoom = await _cacheService.GetAsync<RoomDto>(
                 cachedKey,
                 cancellationToken);
