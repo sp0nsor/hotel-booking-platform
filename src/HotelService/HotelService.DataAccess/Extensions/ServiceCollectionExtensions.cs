@@ -1,0 +1,40 @@
+﻿using HotelService.Core.Abstractions;
+using HotelService.Core.Models;
+using HotelService.DataAccess.Entities;
+using HotelService.DataAccess.Mappings;
+using HotelService.DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace HotelService.DataAccess.Extensions
+{
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddDataAccess(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddDbContext<HotelDbContext>(options =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString(nameof(HotelDbContext)));
+            });
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("Redis");
+                options.InstanceName = "local";
+            });
+
+            services.AddScoped<IRepository<Hotel>, Repository<Hotel, HotelEntity>>();
+            services.AddScoped<IRepository<Room>, Repository<Room, RoomEntity>>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
+
+            services.AddAutoMapper(typeof(HotelProfile));
+            services.AddAutoMapper(typeof(RoomProfile));
+            services.AddAutoMapper(typeof(BookingPeriodEntity));
+
+            return services;
+        }
+    }
+}

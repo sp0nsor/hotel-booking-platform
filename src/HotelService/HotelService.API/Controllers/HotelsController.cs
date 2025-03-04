@@ -1,0 +1,100 @@
+﻿using HotelService.Application.RequestHandlers.Commands.Hotel.Delete;
+using HotelService.Application.DTOs;
+using HotelService.Application.RequestHandlers.Queries.Hotel.GetById;
+using HotelService.Application.RequestHandlers.Commands.Hotel.Create;
+using HotelService.Application.RequestHandlers.Commands.Hotel.Update;
+using HotelService.Application.RequestHandlers.Queries.Hotel.Get;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using HotelService.API.Contracts.Hotels;
+using AutoMapper;
+
+namespace HotelService.API.Controllers
+{
+    [ApiController]
+    [Route("api/hotels")]
+    public class HotelsController : ControllerBase
+    {
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+
+        public HotelsController(
+            IMapper mapper,
+            IMediator mediator)
+        {
+            _mapper = mapper;
+            _mediator = mediator;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateHotel(
+            [FromForm] CreateHotelRequest createHotelRequest,
+            CancellationToken cancellationToken)
+        {
+            var createHotelCommand = _mapper.Map<CreateHotelCommand>(createHotelRequest);
+
+            var result = await _mediator.Send(createHotelCommand, cancellationToken);
+
+            return result.IsSuccess
+                ? Ok()
+                : BadRequest(result.Error);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<HotelDto>>> GetHotels(
+            [FromQuery] int PageIndex,
+            [FromQuery] int PageSize,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetHotelsQuery(PageIndex, PageSize);
+
+            var hotelsPage = await _mediator.Send(query, cancellationToken);
+
+            return Ok(hotelsPage);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetHotelById(
+                [FromRoute] Guid id,
+                CancellationToken cancellationToken)
+        {
+            var query = new GetHotelByIdQuery(id);
+
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? Ok(result.Value)
+                : BadRequest(result.Value);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateHotel(
+            [FromRoute] Guid id,
+            [FromForm] UpdateHotelRequest updateHotelRequest,
+            CancellationToken cancellationToken)
+        {
+            var updateHotelCommand = _mapper.Map<UpdateHotelCommand>(updateHotelRequest);
+            updateHotelCommand.Id = id;
+
+            var result = await _mediator.Send(updateHotelCommand, cancellationToken);
+
+            return result.IsSuccess
+                ? Ok()
+                : BadRequest(result.Error);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteHotel(
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken)
+        {
+            var command = new DeleteHotelCommand(id);
+
+            var result = await _mediator.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? Ok()
+                : BadRequest(result.Error);
+        }
+    }
+}
