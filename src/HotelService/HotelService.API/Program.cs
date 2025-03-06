@@ -33,16 +33,16 @@ services.AddProblemDetails();
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
-
 app.MapControllers();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
+    app.ApplyMigrations();
     app.UseCors("AllowAll");
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
