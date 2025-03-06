@@ -18,13 +18,25 @@ services:
       - postgre_db
       - redis
 
+  bookingservice.api:
+    container_name: booking-service
+    build:
+      context: .
+      dockerfile: src/BookingService/BookingService.API/Dockerfile
+    ports:
+      - "5001:8080"
+    networks:
+      - hotel-booking-dev
+    depends_on:
+      - postgre_db
+
   postgre_db:
-    container_name: postgres
+    container_name: postgres-db
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: hotel-service
+      POSTGRES_DB: hotel-service, booking-service
     ports:
       - "5432:5432"
     networks:
