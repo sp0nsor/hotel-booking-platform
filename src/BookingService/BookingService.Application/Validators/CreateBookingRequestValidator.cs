@@ -10,6 +10,8 @@ namespace BookingService.Application.Validators
             RuleFor(r => r.StartDate)
                 .NotEmpty()
                 .WithMessage("Start date is required")
+                .Must(startDate => startDate >= DateTime.UtcNow.AddDays(1))
+                .WithMessage("Booking must be made at least one day in advance")
                 .LessThan(r => r.EndDate)
                 .WithMessage("Start date must be before end date");
 
