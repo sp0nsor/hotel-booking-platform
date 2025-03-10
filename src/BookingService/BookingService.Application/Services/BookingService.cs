@@ -15,7 +15,7 @@ namespace BookingService.Application.Services
     public class BookingService : IBookingService
     {
         private readonly IRepository<BookingEntity> _bookingRepository;
-        private readonly IValidator<CreateBookingRequest> _bookingDatesRequestValidator;
+        private readonly IValidator<CreateBookingRequest> _createBookingRequestValidator;
         private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
         private readonly IMapper _mapper;
         private readonly IEventBus _eventBus;
@@ -30,7 +30,7 @@ namespace BookingService.Application.Services
             _mapper = mapper;
             _eventBus = eventBus;
             _bookingRepository = bookingRepository;
-            _bookingDatesRequestValidator = dataRequestValidator;
+            _createBookingRequestValidator = dataRequestValidator;
             _getBookingRequestValidator = getBookingRequestValidator;
         }
 
@@ -47,7 +47,7 @@ namespace BookingService.Application.Services
             string guestPhoneNumber = "GuestPhoneNumber";
             string guestEmail = "guest@guest.guest";
 
-            var validationResult = await _bookingDatesRequestValidator.ValidateAsync(
+            var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,
                 cancellationToken);
 
@@ -184,7 +184,7 @@ namespace BookingService.Application.Services
             if (booking.UserId != userId)
                 return Result.Failure("Invalid operation");
 
-            var validationResult = await _bookingDatesRequestValidator.ValidateAsync(
+            var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,
                 cancellationToken);
 
@@ -257,7 +257,7 @@ namespace BookingService.Application.Services
                 dpecification,
                 CancellationToken.None);
 
-            return existingBooking is null ? true : false;
+            return existingBooking is null ? false : true;
         }
     }
 }

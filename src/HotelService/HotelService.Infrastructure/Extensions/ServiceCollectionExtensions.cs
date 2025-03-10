@@ -1,6 +1,7 @@
 ﻿using HotelService.Application.Interfaces;
 using HotelService.Infrastructure.Caching;
 using HotelService.Infrastructure.Files;
+using HotelService.Infrastructure.Mappings;
 using HotelService.Infrastructure.MessageBroker.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +15,16 @@ namespace HotelService.Infrastructure.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddAutoMapper(typeof(BookingProfile));
+
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IImageService, ImageService>();
 
             services.AddMassTransit(busConfiguration =>
             {
                 busConfiguration.AddConsumer<CreateBookingConsumer>();
+                busConfiguration.AddConsumer<UpdateBookingConsumer>();
+                busConfiguration.AddConsumer<CancelBookingConsumer>();
 
                 busConfiguration.SetKebabCaseEndpointNameFormatter();
 

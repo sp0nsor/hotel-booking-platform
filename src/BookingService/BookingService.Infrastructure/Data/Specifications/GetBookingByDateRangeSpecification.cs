@@ -31,6 +31,7 @@ namespace BookingService.Infrastructure.Data.Specifications
             return booking =>
                 booking.HotelId == _hotelId && 
                 booking.RoomId == _roomId && 
+                !booking.IsOutdated &&
                 (booking.StartDate <= _endDate && booking.EndDate >= _startDate) &&
                 (_excludeBookingId == null || booking.Id != _excludeBookingId);
         }

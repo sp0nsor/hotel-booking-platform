@@ -20,6 +20,8 @@ namespace HotelService.DataAccess.Extensions
                 options.UseNpgsql(configuration.GetConnectionString(nameof(HotelDbContext)));
             });
 
+            services.AddScoped<IRepository<BookingPeriod>, Repository<BookingPeriod, BookingPeriodEntity>>();
+            services.AddScoped<IBookingRepository,  BookingRepository>();
             services.AddScoped<IRepository<Hotel>, Repository<Hotel, HotelEntity>>();
             services.AddScoped<IRepository<Room>, Repository<Room, RoomEntity>>();
             services.AddScoped<IRoomRepository, RoomRepository>();

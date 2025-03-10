@@ -16,7 +16,7 @@ namespace BookingService.Application.Extensions
 
             services.AddScoped<IBookingService, Services.BookingService>();
 
-            services.AddScoped<IValidator<CreateBookingRequest>, BookingDatesRequestValidator>();
+            services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
             services.AddScoped<IValidator<GetBookingsRequest>, GetBookingsRequestValidator>();
 
             return services;
