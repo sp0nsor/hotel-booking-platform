@@ -1,6 +1,6 @@
 ﻿namespace BookingService.Application.Requests
 {
-    public record BookingDatesRequest(
+    public record CreateBookingRequest(
         DateTime StartDate,
         DateTime EndDate);
 }

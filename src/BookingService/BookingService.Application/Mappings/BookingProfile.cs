@@ -10,8 +10,8 @@ namespace BookingService.Application.Mappings
     {
         public BookingProfile()
         {
-            CreateMap<BookingDatesRequest, BookingEntity>();
-            CreateMap<BookingDatesRequest, BookingEntity>();
+            CreateMap<CreateBookingRequest, BookingEntity>();
+            CreateMap<CreateBookingRequest, BookingEntity>();
 
             CreateMap<BookingEntity, CancelBookingEvent>();
             CreateMap<BookingEntity, UpdateBookingEvent>();

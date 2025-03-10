@@ -51,13 +51,13 @@ namespace BookingService.API.Controllers
         public async Task<ActionResult> CreateBooking(
             [FromRoute] Guid hotelId,
             [FromRoute] Guid roomId,
-            [FromBody] BookingDatesRequest bookingDatesRequest, 
+            [FromBody] CreateBookingRequest bookingRequest, 
             CancellationToken cancellationToken)
         {
             var result = await _bookingsService.CreateBookingAsync(
                 hotelId,
                 roomId,
-                bookingDatesRequest,
+                bookingRequest,
                 cancellationToken);
 
             return result.IsSuccess
@@ -69,13 +69,13 @@ namespace BookingService.API.Controllers
         public async Task<ActionResult> UpdateBooking(
             [FromRoute] Guid userId,
             [FromRoute] Guid bookingId,
-            [FromBody] BookingDatesRequest bookingDatesRequest,
+            [FromBody] CreateBookingRequest bookingRequest,
             CancellationToken cancellationToken)
         {
             var result = await _bookingsService.UpdateBookingAsync(
                 userId,
                 bookingId,
-                bookingDatesRequest,
+                bookingRequest,
                 cancellationToken);
 
             return result.IsSuccess
