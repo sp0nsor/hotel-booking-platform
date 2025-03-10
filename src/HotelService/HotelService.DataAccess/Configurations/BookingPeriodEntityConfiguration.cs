@@ -14,10 +14,20 @@ namespace HotelService.DataAccess.Configurations
                 .IsRequired();
 
             builder.Property(b => b.StartDate)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion(
+                    p => p.ToUniversalTime(),
+                    p => DateTime.SpecifyKind(
+                        p,
+                        DateTimeKind.Utc));
 
             builder.Property(b => b.EndDate)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion(
+                    p => p.ToUniversalTime(),
+                    p => DateTime.SpecifyKind(
+                        p,
+                        DateTimeKind.Utc));
 
             builder.HasIndex(b => b.RoomId);
         }

@@ -2,10 +2,11 @@
 using HotelService.Application.RequestHandlers.Commands.Booking.Update;
 using MassTransit;
 using MediatR;
+using Shared.Contracts.Bookings;
 
 namespace HotelService.Infrastructure.MessageBroker.Consumers
 {
-    public class UpdateBookingConsumer : IConsumer<UpdateBookingConsumer>
+    public class UpdateBookingConsumer : IConsumer<UpdateBookingEvent>
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
@@ -18,7 +19,7 @@ namespace HotelService.Infrastructure.MessageBroker.Consumers
             _mapper = mapper;
         }
 
-        public async Task Consume(ConsumeContext<UpdateBookingConsumer> context)
+        public async Task Consume(ConsumeContext<UpdateBookingEvent> context)
         {
             var updateBookingCommand = _mapper.Map<UpdateBookingCommand>(context.Message);
 
