@@ -1,6 +1,6 @@
-﻿namespace HotelService.API.Contracts.Hotels
+﻿namespace HotelService.API.Requests.Hotels
 {
-    public record CreateHotelRequest(
+    public record UpdateHotelRequest(
         string Name,
         string Description,
         string PhoneNumber,
@@ -8,5 +8,5 @@
         string City,
         string Street,
         string PriceCategory,
-        IFormFile Image);
+        IFormFile? Image = null);
 }

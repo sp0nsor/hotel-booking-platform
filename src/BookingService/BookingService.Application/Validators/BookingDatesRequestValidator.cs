@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BookingService.Application.Validators
 {
-    public class BookingDataRequestValidator : AbstractValidator<BookingDataRequest>
+    public class BookingDatesRequestValidator : AbstractValidator<BookingDatesRequest>
     {
-        public BookingDataRequestValidator()
+        public BookingDatesRequestValidator()
         {
             RuleFor(r => r.StartDate)
                 .NotEmpty()

@@ -6,10 +6,10 @@ namespace BookingService.Application.Interfaces
 {
     public interface IBookingService
     {
-        Task<Result> CancelBookingAsync(Guid id, CancellationToken cancellationToken);
-        Task<Result> CreateBookingAsync(BookingDataRequest bookingDataRequest, CancellationToken cancellationToken);
-        Task<Result> DeleteBookingAsync(Guid id, CancellationToken cancellationToken);
-        Task<Result<PaginatedResult<BookingDto>>> GetHotelBookingsAsync(Guid hotelId, GetBookingsRequest getBookingsRequest, CancellationToken cancellationToken);
-        Task<Result> UpdateBookingAsync(Guid id, BookingDataRequest bookingDataRequest, CancellationToken cancellationToken);
+        Task<Result<PaginatedResult<BookingDto>>> GetBookingsByUserIdAsync(Guid userId, GetBookingsRequest getBookingsRequest, CancellationToken cancellationToken);
+        Task<Result<PaginatedResult<BookingDto>>> GetBookingsByHotelIdAsync(Guid hotelId, GetBookingsRequest getBookingsRequest, CancellationToken cancellationToken);
+        Task<Result> CreateBookingAsync(Guid hotelId, Guid roomId, BookingDatesRequest bookingDates, CancellationToken cancellationToken);
+        Task<Result> UpdateBookingAsync(Guid userId, Guid bookingId, BookingDatesRequest bookingDatesRequest, CancellationToken cancellationToken);
+        Task<Result> CancelBookingAsync(Guid userId, Guid bookingId, CancellationToken cancellationToken);
     }
 }

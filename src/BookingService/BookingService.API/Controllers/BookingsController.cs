@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookingService.API.Controllers
 {
     [ApiController]
-    [Route("api/bookings")]
+    [Route("api")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingsService;
@@ -15,13 +15,13 @@ namespace BookingService.API.Controllers
             _bookingsService = bookingsService;
         }
 
-        [HttpGet("{hotelId}")]
-        public async Task<ActionResult> GetHotelBookings(
+        [HttpGet("hotels/{hotelId}/bookins")]
+        public async Task<ActionResult> GetBookingsByHotelId(
             [FromRoute] Guid hotelId,
             [FromQuery] GetBookingsRequest getBookingsRequest,
             CancellationToken cancellationToken)
         {
-            var result = await _bookingsService.GetHotelBookingsAsync(
+            var result = await _bookingsService.GetBookingsByHotelIdAsync(
                 hotelId,
                 getBookingsRequest,
                 cancellationToken);
@@ -31,13 +31,33 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpPost]
+        [HttpGet("users/{userId}/bookings")]
+        public async Task<ActionResult> GetBookingsByUserId(
+            [FromRoute] Guid userId, 
+            [FromQuery] GetBookingsRequest getBookingsRequest, 
+            CancellationToken cancellationToken)
+        {
+            var result = await _bookingsService.GetBookingsByUserIdAsync(
+                userId,
+                getBookingsRequest,
+                cancellationToken);
+
+            return result.IsSuccess
+                ? Ok(result.Value)
+                : BadRequest(result.Error);
+        }
+
+        [HttpPost("hotels/{hotelId}/rooms/{roomId}/bookings")]
         public async Task<ActionResult> CreateBooking(
-            [FromBody] BookingDataRequest bookingDataRequest, 
+            [FromRoute] Guid hotelId,
+            [FromRoute] Guid roomId,
+            [FromBody] BookingDatesRequest bookingDatesRequest, 
             CancellationToken cancellationToken)
         {
             var result = await _bookingsService.CreateBookingAsync(
-                bookingDataRequest,
+                hotelId,
+                roomId,
+                bookingDatesRequest,
                 cancellationToken);
 
             return result.IsSuccess
@@ -45,15 +65,17 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("users/{userId}/bookings/{bookingId}")]
         public async Task<ActionResult> UpdateBooking(
-            [FromRoute] Guid id,
-            [FromBody] BookingDataRequest bookingDataRequest,
+            [FromRoute] Guid userId,
+            [FromRoute] Guid bookingId,
+            [FromBody] BookingDatesRequest bookingDatesRequest,
             CancellationToken cancellationToken)
         {
             var result = await _bookingsService.UpdateBookingAsync(
-                id,
-                bookingDataRequest,
+                userId,
+                bookingId,
+                bookingDatesRequest,
                 cancellationToken);
 
             return result.IsSuccess
@@ -61,27 +83,15 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpPatch("{id}/cancel")]
+        [HttpPatch("users/{userId}/bookings/{bookingId}/cancelled")]
         public async Task<ActionResult> CancelBooking(
-            [FromRoute] Guid id,
+            [FromRoute] Guid userId,
+            [FromRoute] Guid bookingId,
             CancellationToken cancellationToken)
         {
             var result = await _bookingsService.CancelBookingAsync(
-                id,
-                cancellationToken);
-
-            return result.IsSuccess 
-                ? Ok() 
-                : BadRequest(result.Error);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBooking(
-            [FromRoute] Guid id,
-            CancellationToken cancellationToken)
-        {
-            var result = await _bookingsService.DeleteBookingAsync(
-                id, 
+                userId,
+                bookingId,
                 cancellationToken);
 
             return result.IsSuccess 

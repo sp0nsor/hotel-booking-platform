@@ -1,7 +1,8 @@
-﻿using HotelService.DataAccess;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace HotelService.API.Extensions
+namespace HotelService.DataAccess.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

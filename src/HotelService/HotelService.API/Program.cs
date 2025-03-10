@@ -16,7 +16,7 @@ services.AddSwaggerGen();
 services
     .AddApi()
     .AddApplication()
-    .AddInfrastructure()
+    .AddInfrastructure(configuration)
     .AddDataAccess(configuration);
 
 services.AddCors(options =>

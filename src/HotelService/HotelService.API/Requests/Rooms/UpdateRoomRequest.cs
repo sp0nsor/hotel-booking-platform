@@ -1,4 +1,4 @@
-﻿namespace HotelService.API.Contracts.Rooms
+﻿namespace HotelService.API.Requests.Rooms
 {
     public record UpdateRoomRequest(
         int Area,

@@ -8,7 +8,7 @@
         string GuestLastName,
         string GuestPhoneNumber,
         string GuestEmail,
+        bool IsOutdated,
         DateTime StartDate,
-        DateTime EndDate,
-        decimal TotalPrice);
+        DateTime EndDate);
 }

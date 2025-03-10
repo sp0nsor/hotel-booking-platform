@@ -16,6 +16,7 @@ services:
       - hotel-booking-dev
     depends_on:
       - postgre_db
+      - rabbitmq
       - redis
 
   bookingservice.api:
@@ -29,6 +30,7 @@ services:
       - hotel-booking-dev
     depends_on:
       - postgre_db
+      - rabbitmq
 
   postgre_db:
     container_name: postgres-db
@@ -54,6 +56,19 @@ services:
     volumes:
       - redis-data:/data
 
+  rabbitmq:
+    container_name: rabbitmq-broker
+    image: rabbitmq:4.0-management
+    hostname: "bookings-queue"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - hotel-booking-dev
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
 volumes:
   postgres-data:
   redis-data:
+  rabbitmq-data:

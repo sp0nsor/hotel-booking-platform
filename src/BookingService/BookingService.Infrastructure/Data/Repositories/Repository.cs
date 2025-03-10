@@ -15,19 +15,13 @@ namespace BookingService.Infrastructure.Data.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<T?> GetByIdAsync(
-            Guid id,
-            CancellationToken cancellationToken,
-            params string[] includeProperties)
+        public virtual async Task<T?> GetSingleAsync(
+            Specification<T> specification,
+            CancellationToken cancellationToken)
         {
-            var query = _dbSet.AsQueryable();
-
-            foreach (var includeProperty in includeProperties)
-                query = query.Include(includeProperty);
-
-            var entity = await query
+            var entity = await _dbSet
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, cancellationToken);
+                .FirstOrDefaultAsync(specification.ToExpression(), cancellationToken);
 
             return entity != null ? entity : null;
         }

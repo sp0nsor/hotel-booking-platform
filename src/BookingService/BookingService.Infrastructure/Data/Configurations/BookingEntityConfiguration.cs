@@ -11,6 +11,9 @@ namespace BookingService.Infrastructure.Data.Configurations
         {
             builder.HasKey(b => b.Id);
 
+            builder.Property(b => b.UserId)
+                .IsRequired();
+
             builder.Property(b => b.HotelId)
                 .IsRequired();
 
@@ -48,10 +51,6 @@ namespace BookingService.Infrastructure.Data.Configurations
                     p => DateTime.SpecifyKind(
                         p,
                         DateTimeKind.Utc));
-
-            builder.Property(b => b.TotalPrice)
-                .IsRequired()
-                .HasColumnType("decimal(18, 2)");
 
             builder.HasIndex(b => b.HotelId);
         }

@@ -16,6 +16,7 @@ namespace BookingService.Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     HotelId = table.Column<Guid>(type: "uuid", nullable: false),
                     RoomId = table.Column<Guid>(type: "uuid", nullable: false),
                     IsOutdated = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -24,8 +25,7 @@ namespace BookingService.Infrastructure.Data.Migrations
                     GuestPhoneNumber = table.Column<string>(type: "text", nullable: false),
                     GuestEmail = table.Column<string>(type: "text", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "numeric(18,2)", nullable: false)
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

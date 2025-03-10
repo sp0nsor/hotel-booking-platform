@@ -5,35 +5,51 @@ using BookingService.Application.Requests;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Specifications;
 using BookingService.Infrastructure.Interfaces.Data;
+using BookingService.Infrastructure.Interfaces.MessageBroker;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using Shared.Contracts.Bookings;
 
 namespace BookingService.Application.Services
 {
     public class BookingService : IBookingService
     {
         private readonly IRepository<BookingEntity> _bookingRepository;
-        private readonly IValidator<BookingDataRequest> _bookingDataRequestValidator;
+        private readonly IValidator<BookingDatesRequest> _bookingDatesRequestValidator;
         private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
         private readonly IMapper _mapper;
+        private readonly IEventBus _eventBus;
 
         public BookingService(
             IMapper mapper,
+            IEventBus eventBus,
             IRepository<BookingEntity> bookingRepository,
-            IValidator<BookingDataRequest> dataRequestValidator,
+            IValidator<BookingDatesRequest> dataRequestValidator,
             IValidator<GetBookingsRequest> getBookingRequestValidator)
         {
             _mapper = mapper;
+            _eventBus = eventBus;
             _bookingRepository = bookingRepository;
-            _bookingDataRequestValidator = dataRequestValidator;
+            _bookingDatesRequestValidator = dataRequestValidator;
             _getBookingRequestValidator = getBookingRequestValidator;
         }
 
         public async Task<Result> CreateBookingAsync(
-            BookingDataRequest createBookingRequest,
+            Guid hotelId,
+            Guid roomId,
+            BookingDatesRequest bookingDatesRequest,
             CancellationToken cancellationToken)
         {
-            var validationResult = _bookingDataRequestValidator.Validate(createBookingRequest);
+            // gRPC logic
+            Guid userId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+            string guestFirstName = "GuestFirstName";
+            string guestLastName = "GuestLastName";
+            string guestPhoneNumber = "GuestPhoneNumber";
+            string guestEmail = "guest@guest.guest";
+
+            var validationResult = await _bookingDatesRequestValidator.ValidateAsync(
+                bookingDatesRequest,
+                cancellationToken);
 
             if (!validationResult.IsValid)
             {
@@ -41,20 +57,48 @@ namespace BookingService.Application.Services
                 return Result.Failure(string.Join("; ", errors));
             }
 
-            var bookingEntity = _mapper.Map<BookingEntity>(createBookingRequest);
-            bookingEntity.Id = Guid.NewGuid();
+            if(await HasBookingConflictAsync(
+                hotelId, 
+                roomId, 
+                bookingDatesRequest.StartDate, 
+                bookingDatesRequest.EndDate))
+            {
+                return Result.Failure("Date conflict");
+            }
 
-            await _bookingRepository.CreateAsync(bookingEntity, cancellationToken);
+            var bookingEntity = new BookingEntity
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                HotelId = hotelId,
+                RoomId = roomId,
+                GuestFirstName = guestFirstName,
+                GuestLastName = guestLastName,
+                GuestPhoneNumber = guestPhoneNumber,
+                GuestEmail = guestEmail,
+                StartDate = bookingDatesRequest.StartDate,
+                EndDate = bookingDatesRequest.EndDate
+            };
+
+            await _bookingRepository.CreateAsync(
+                bookingEntity, 
+                cancellationToken);
+
+            var createBookingEvent = _mapper.Map<CreateBookingEvent>(bookingEntity);
+
+            await _eventBus.PublishAsync(createBookingEvent, cancellationToken);
 
             return Result.Success();
         }
 
-        public async Task<Result<PaginatedResult<BookingDto>>> GetHotelBookingsAsync(
-            Guid hotelId,
+        public async Task<Result<PaginatedResult<BookingDto>>> GetBookingsByUserIdAsync(
+            Guid userId,
             GetBookingsRequest getBookingsRequest,
             CancellationToken cancellationToken)
         {
-            var validationResult = _getBookingRequestValidator.Validate(getBookingsRequest);
+            var validationResult = await _getBookingRequestValidator.ValidateAsync(
+                getBookingsRequest,
+                cancellationToken);
 
             if (!validationResult.IsValid)
             {
@@ -62,55 +106,52 @@ namespace BookingService.Application.Services
                 return Result.Failure<PaginatedResult<BookingDto>>(string.Join("; ", errors));
             }
 
-            var hotelBookingsSpecification = new HotelBookingsSpecification(
-                hotelId,
-                getBookingsRequest.IsOutDate,
-                getBookingsRequest.SearchFirstName,
-                getBookingsRequest.SearchLastName);
+            var specification = new GetBookingsByUserIdSpecification(
+                userId,
+                getBookingsRequest.IsOutDate);
 
-            var (bookingEntities, totalPages) = await _bookingRepository.GetAsync(
-                hotelBookingsSpecification,
-                getBookingsRequest.PageIndex,
-                getBookingsRequest.PageSize,
-                cancellationToken);
-
-            return new PaginatedResult<BookingDto>
-            {
-                Items = _mapper.Map<List<BookingDto>>(bookingEntities),
-                CurrentPage = getBookingsRequest.PageIndex,
-                PageSize = getBookingsRequest.PageSize,
-                TotalPages = totalPages
-            };
+            return await GetPaginatedBookingsAsync(specification, getBookingsRequest, cancellationToken);
         }
 
-        public async Task<Result> DeleteBookingAsync(
-            Guid id,
+        public async Task<Result<PaginatedResult<BookingDto>>> GetBookingsByHotelIdAsync(
+            Guid hotelId,
+            GetBookingsRequest getBookingsRequest,
             CancellationToken cancellationToken)
         {
-            var booking = await _bookingRepository.GetByIdAsync(
-                id,
+            var validationResult = await _getBookingRequestValidator.ValidateAsync(
+                getBookingsRequest,
                 cancellationToken);
 
-            if (booking is null)
-                return Result.Failure("Booking not found");
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
 
-            await _bookingRepository.DeleteAsync(
-                booking,
-                cancellationToken);
+                return Result.Failure<PaginatedResult<BookingDto>>(string.Join("; ", errors));
+            }
 
-            return Result.Success();
+            var specification = new GetHotelBookingsSpecification(
+                hotelId,
+                getBookingsRequest.IsOutDate);
+
+            return await GetPaginatedBookingsAsync(specification, getBookingsRequest, cancellationToken);
         }
 
         public async Task<Result> CancelBookingAsync(
-            Guid id,
+            Guid userId,
+            Guid bookingId,
             CancellationToken cancellationToken)
         {
-            var booking = await _bookingRepository.GetByIdAsync(
-                id,
+            var specification = new GetBookingByIdSpecification(bookingId);
+
+            var booking = await _bookingRepository.GetSingleAsync(
+                specification,
                 cancellationToken);
 
             if (booking is null)
                 return Result.Failure("Booking not found");
+
+            if (booking.UserId != userId)
+                return Result.Failure("Invalid operation");
 
             booking.IsOutdated = true;
 
@@ -118,37 +159,105 @@ namespace BookingService.Application.Services
                 booking,
                 cancellationToken);
 
+            var cancelBookingEvent = _mapper.Map<CancelBookingEvent>(booking);
+
+            await _eventBus.PublishAsync(cancelBookingEvent, cancellationToken);
+
             return Result.Success();
         }
 
         public async Task<Result> UpdateBookingAsync(
-            Guid id,
-            BookingDataRequest updateBookingRequest,
+            Guid userId,
+            Guid bookingId,
+            BookingDatesRequest bookingDatesRequest,
             CancellationToken cancellationToken)
         {
-            var validationResult = _bookingDataRequestValidator.Validate(updateBookingRequest);
+            var specification = new GetBookingByIdSpecification(bookingId);
 
-            if(!validationResult.IsValid)
+            var booking = await _bookingRepository.GetSingleAsync(
+                specification,
+                cancellationToken);
+
+            if (booking is null)
+                return Result.Failure("Booking not found");
+
+            if (booking.UserId != userId)
+                return Result.Failure("Invalid operation");
+
+            var validationResult = await _bookingDatesRequestValidator.ValidateAsync(
+                bookingDatesRequest,
+                cancellationToken);
+
+            if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+
                 return Result.Failure(string.Join("; ", errors));
             }
 
-            var oldBooking = _bookingRepository.GetByIdAsync(
-                id,
-                cancellationToken);
+            if (await HasBookingConflictAsync(
+                booking.HotelId,
+                booking.RoomId,
+                bookingDatesRequest.StartDate,
+                bookingDatesRequest.EndDate,
+                booking.Id))
+            {
+                return Result.Failure("Date conflict");
+            }
 
-            if (oldBooking is null)
-                return Result.Failure("Booking not found");
-
-            var updatedBooking = _mapper.Map<BookingEntity>(updateBookingRequest);
-            updatedBooking.Id = id;
+            booking.StartDate = bookingDatesRequest.StartDate;
+            booking.EndDate = bookingDatesRequest.EndDate;
 
             await _bookingRepository.UpdateAsync(
-                updatedBooking,
+                booking,
                 cancellationToken);
 
+            var updateBookingEvent = _mapper.Map<UpdateBookingEvent>(booking);
+
+            await _eventBus.PublishAsync(updateBookingEvent, cancellationToken);
+
             return Result.Success();
+        }
+
+        private async Task<PaginatedResult<BookingDto>> GetPaginatedBookingsAsync(
+            Specification<BookingEntity> spec,
+            GetBookingsRequest request,
+            CancellationToken cancellationToken)
+        {
+            var (items, totalPages) = await _bookingRepository.GetAsync(
+                spec,
+                request.PageIndex,
+                request.PageSize,
+                cancellationToken);
+
+            return new PaginatedResult<BookingDto>
+            {
+                Items = _mapper.Map<List<BookingDto>>(items),
+                CurrentPage = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalPages = totalPages
+            };
+        }
+
+        private async Task<bool> HasBookingConflictAsync(
+            Guid hotelId,
+            Guid roomId,
+            DateTime startDate,
+            DateTime endDate,
+            Guid? excludeId = null)
+        {
+            var dpecification = new GetBookingByDateRangeSpecification(
+                hotelId,
+                roomId,
+                startDate,
+                endDate,
+                excludeId);
+
+            var existingBooking = await _bookingRepository.GetSingleAsync(
+                dpecification,
+                CancellationToken.None);
+
+            return existingBooking is null ? true : false;
         }
     }
 }

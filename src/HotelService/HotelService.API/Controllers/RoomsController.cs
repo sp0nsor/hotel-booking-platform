@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HotelService.API.Contracts.Rooms;
+using HotelService.API.Requests.Rooms;
 using HotelService.Application.RequestHandlers.Commands.Room.Create;
 using HotelService.Application.RequestHandlers.Commands.Room.Delete;
 using HotelService.Application.RequestHandlers.Commands.Room.Update;
