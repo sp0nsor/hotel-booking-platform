@@ -15,7 +15,7 @@ namespace BookingService.API.Controllers
             _bookingsService = bookingsService;
         }
 
-        [HttpGet("hotels/{hotelId}/bookins")]
+        [HttpGet("hotels/{hotelId}/bookings")]
         public async Task<ActionResult> GetBookingsByHotelId(
             [FromRoute] Guid hotelId,
             [FromQuery] GetBookingsRequest getBookingsRequest,
