@@ -2,7 +2,7 @@
 
 namespace HotelService.Core.Abstractions
 {
-    public interface IBookingRepository : IRepository<BookingPeriod>
+    public interface IBookingPeriodRepository : IRepository<BookingPeriod>
     {
         Task<BookingPeriod?> GetByIdAsync(Guid bookingId, Guid roomId, CancellationToken cancellationToken);
     }

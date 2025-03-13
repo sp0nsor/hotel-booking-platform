@@ -5,24 +5,28 @@ using BookingService.Application.Requests;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Specifications;
 using BookingService.Infrastructure.Interfaces.Data;
+using BookingService.Infrastructure.Interfaces.Services;
 using BookingService.Infrastructure.Interfaces.MessageBroker;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using Hangfire;
 using Shared.Contracts.Bookings;
 
 namespace BookingService.Application.Services
 {
     public class BookingService : IBookingService
     {
-        private readonly IRepository<BookingEntity> _bookingRepository;
-        private readonly IValidator<CreateBookingRequest> _createBookingRequestValidator;
-        private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
         private readonly IMapper _mapper;
         private readonly IEventBus _eventBus;
+        private readonly IRepository<BookingEntity> _bookingRepository;
+        private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
+        private readonly IValidator<CreateBookingRequest> _createBookingRequestValidator;
 
         public BookingService(
             IMapper mapper,
             IEventBus eventBus,
+            IEmailService emailService,
+            IBackgroundJobClient backgroundJobClient,
             IRepository<BookingEntity> bookingRepository,
             IValidator<CreateBookingRequest> dataRequestValidator,
             IValidator<GetBookingsRequest> getBookingRequestValidator)
@@ -45,7 +49,7 @@ namespace BookingService.Application.Services
             string guestFirstName = "GuestFirstName";
             string guestLastName = "GuestLastName";
             string guestPhoneNumber = "GuestPhoneNumber";
-            string guestEmail = "guest@guest.guest";
+            string guestEmail = "macy.kunde@ethereal.email";
 
             var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,
@@ -125,7 +129,6 @@ namespace BookingService.Application.Services
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-
                 return Result.Failure<PaginatedResult<BookingDto>>(string.Join("; ", errors));
             }
 
@@ -246,7 +249,7 @@ namespace BookingService.Application.Services
             DateTime endDate,
             Guid? excludeId = null)
         {
-            var dpecification = new GetBookingByDateRangeSpecification(
+            var specification = new GetBookingByDateRangeSpecification(
                 hotelId,
                 roomId,
                 startDate,
@@ -254,7 +257,7 @@ namespace BookingService.Application.Services
                 excludeId);
 
             var existingBooking = await _bookingRepository.GetSingleAsync(
-                dpecification,
+                specification,
                 CancellationToken.None);
 
             return existingBooking is null ? false : true;

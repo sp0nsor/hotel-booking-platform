@@ -6,9 +6,9 @@ using Shared.Contracts.Bookings;
 
 namespace HotelService.Infrastructure.Mappings
 {
-    public class BookingProfile : Profile
+    public class BookingPeriodProfie : Profile
     {
-        public BookingProfile()
+        public BookingPeriodProfie()
         {
             CreateMap<CreateBookingEvent, CreateBookingCommand>();
             CreateMap<UpdateBookingEvent, UpdateBookingCommand>();

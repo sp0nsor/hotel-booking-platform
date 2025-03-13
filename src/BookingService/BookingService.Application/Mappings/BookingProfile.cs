@@ -11,7 +11,6 @@ namespace BookingService.Application.Mappings
         public BookingProfile()
         {
             CreateMap<CreateBookingRequest, BookingEntity>();
-            CreateMap<CreateBookingRequest, BookingEntity>();
 
             CreateMap<BookingEntity, CancelBookingEvent>();
             CreateMap<BookingEntity, UpdateBookingEvent>();

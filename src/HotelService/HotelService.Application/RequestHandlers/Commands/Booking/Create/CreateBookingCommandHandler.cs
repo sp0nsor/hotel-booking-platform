@@ -10,16 +10,16 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Create
         : IRequestHandler<CreateBookingCommand, Result>
     {
         private readonly ICacheService _cacheService;
-        private readonly IBookingRepository _bookingRepository;
+        private readonly IBookingPeriodRepository _bookingPeriodRepository;
         private readonly IRoomRepository _roomRepository;
 
         public CreateBookingCommandHandler(
             ICacheService cacheService,
-            IBookingRepository bookingRepository,
+            IBookingPeriodRepository bookingRepository,
             IRoomRepository roomRepository)
         {
             _cacheService = cacheService;
-            _bookingRepository = bookingRepository;
+            _bookingPeriodRepository = bookingRepository;
             _roomRepository = roomRepository;
         }
 
@@ -47,7 +47,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Create
             if (room.BookingPeriods.Any(createBookingResult.Value.Overlaps))
                 return Result.Failure("Conflict booking dates");
 
-            await _bookingRepository.AddAsync(
+            await _bookingPeriodRepository.AddAsync(
                 createBookingResult.Value,
                 cancellationToken);
 

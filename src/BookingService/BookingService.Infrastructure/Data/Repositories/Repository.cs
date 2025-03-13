@@ -23,7 +23,7 @@ namespace BookingService.Infrastructure.Data.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(specification.ToExpression(), cancellationToken);
 
-            return entity != null ? entity : null;
+            return entity;
         }
 
         public virtual async Task<(IEnumerable<T> Items, int TotalPages)> GetAsync(
@@ -59,15 +59,6 @@ namespace BookingService.Infrastructure.Data.Repositories
             CancellationToken cancellationToken)
         {
             _dbSet.Update(entity);
-
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        public virtual async Task DeleteAsync(
-            T entity,
-            CancellationToken cancellationToken)
-        {
-            _dbSet.Remove(entity);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

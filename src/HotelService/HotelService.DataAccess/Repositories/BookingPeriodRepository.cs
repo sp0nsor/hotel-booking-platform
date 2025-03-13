@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelService.DataAccess.Repositories
 {
-    public class BookingRepository
-        : Repository<BookingPeriod, BookingPeriodEntity>, IBookingRepository
+    public class BookingPeriodRepository
+        : Repository<BookingPeriod, BookingPeriodEntity>, IBookingPeriodRepository
     {
-        public BookingRepository(HotelDbContext context, IMapper mapper) : base(context, mapper)
+        public BookingPeriodRepository(HotelDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
 

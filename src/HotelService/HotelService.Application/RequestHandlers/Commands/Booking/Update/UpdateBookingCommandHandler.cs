@@ -10,16 +10,16 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Update
         : IRequestHandler<UpdateBookingCommand, Result>
     {
         private readonly ICacheService _cacheService;
-        private readonly IBookingRepository _bookingRepository;
+        private readonly IBookingPeriodRepository _bookingPeriodRepository;
         private readonly IRoomRepository _roomRepository;
 
         public UpdateBookingCommandHandler(
             ICacheService cacheService,
-            IBookingRepository bookingRepository,
+            IBookingPeriodRepository bookingRepository,
             IRoomRepository roomRepository)
         {
             _cacheService = cacheService;
-            _bookingRepository = bookingRepository;
+            _bookingPeriodRepository = bookingRepository;
             _roomRepository = roomRepository;
         }
 
@@ -45,7 +45,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Update
             if (room.BookingPeriods.Any(createBookingResult.Value.Overlaps))
                 return Result.Failure("Conflict booking dates");
 
-            var existBooking = await _bookingRepository.GetByIdAsync(
+            var existBooking = await _bookingPeriodRepository.GetByIdAsync(
                 request.Id,
                 request.RoomId,
                 cancellationToken);
@@ -53,7 +53,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Update
             if (existBooking is null)
                 return Result.Failure("Booking not found");
 
-            await _bookingRepository.UpdateAsync(
+            await _bookingPeriodRepository.UpdateAsync(
                 createBookingResult.Value,
                 cancellationToken);
 

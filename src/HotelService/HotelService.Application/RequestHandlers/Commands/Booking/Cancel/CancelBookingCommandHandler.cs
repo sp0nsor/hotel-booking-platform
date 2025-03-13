@@ -9,19 +9,19 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Cancel
         : IRequestHandler<CancelBookingCommand, Result>
     {
         private readonly ICacheService _cacheService;
-        private readonly IBookingRepository _bookingRepository;
+        private readonly IBookingPeriodRepository _bookingPeriodRepository;
 
         public CancelBookingCommandHandler(
             ICacheService cacheService,
-            IBookingRepository bookingRepository)
+            IBookingPeriodRepository bookingRepository)
         {
             _cacheService = cacheService;
-            _bookingRepository = bookingRepository;
+            _bookingPeriodRepository = bookingRepository;
         }
 
         public async Task<Result> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
         {
-            var booking = await _bookingRepository.GetByIdAsync(
+            var booking = await _bookingPeriodRepository.GetByIdAsync(
                 request.Id,
                 request.RoomId,
                 cancellationToken);
@@ -29,7 +29,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Booking.Cancel
             if (booking is null)
                 return Result.Failure("Booking not found");
 
-            await _bookingRepository.DeleteAsync(
+            await _bookingPeriodRepository.DeleteAsync(
                 booking,
                 cancellationToken);
 
