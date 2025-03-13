@@ -45,7 +45,7 @@ namespace BookingService.Application.Services
             string guestFirstName = "GuestFirstName";
             string guestLastName = "GuestLastName";
             string guestPhoneNumber = "GuestPhoneNumber";
-            string guestEmail = "macy.kunde@ethereal.email";
+            string guestEmail = "mazie.zemlak@ethereal.email";
 
             var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,
@@ -59,7 +59,7 @@ namespace BookingService.Application.Services
 
             if(await HasBookingConflictAsync(
                 hotelId, 
-                roomId, 
+                roomId,
                 bookingRequest.StartDate, 
                 bookingRequest.EndDate))
             {
@@ -110,7 +110,10 @@ namespace BookingService.Application.Services
                 userId,
                 getBookingsRequest.IsOutDate);
 
-            return await GetPaginatedBookingsAsync(specification, getBookingsRequest, cancellationToken);
+            return await GetPaginatedBookingsAsync(
+                specification, 
+                getBookingsRequest, 
+                cancellationToken);
         }
 
         public async Task<Result<PaginatedResult<BookingDto>>> GetBookingsByHotelIdAsync(
@@ -128,11 +131,14 @@ namespace BookingService.Application.Services
                 return Result.Failure<PaginatedResult<BookingDto>>(string.Join("; ", errors));
             }
 
-            var specification = new GetHotelBookingsSpecification(
+            var specification = new GetBookingsByHotelIdSpecification(
                 hotelId,
                 getBookingsRequest.IsOutDate);
 
-            return await GetPaginatedBookingsAsync(specification, getBookingsRequest, cancellationToken);
+            return await GetPaginatedBookingsAsync(
+                specification, 
+                getBookingsRequest, 
+                cancellationToken);
         }
 
         public async Task<Result> CancelBookingAsync(
@@ -190,7 +196,6 @@ namespace BookingService.Application.Services
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-
                 return Result.Failure(string.Join("; ", errors));
             }
 
