@@ -5,11 +5,9 @@ using BookingService.Application.Requests;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Specifications;
 using BookingService.Infrastructure.Interfaces.Data;
-using BookingService.Infrastructure.Interfaces.Services;
 using BookingService.Infrastructure.Interfaces.MessageBroker;
 using CSharpFunctionalExtensions;
 using FluentValidation;
-using Hangfire;
 using Shared.Contracts.Bookings;
 
 namespace BookingService.Application.Services
@@ -25,8 +23,6 @@ namespace BookingService.Application.Services
         public BookingService(
             IMapper mapper,
             IEventBus eventBus,
-            IEmailService emailService,
-            IBackgroundJobClient backgroundJobClient,
             IRepository<BookingEntity> bookingRepository,
             IValidator<CreateBookingRequest> dataRequestValidator,
             IValidator<GetBookingsRequest> getBookingRequestValidator)
