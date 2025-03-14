@@ -16,15 +16,29 @@ services:
       - hotel-booking-dev
     depends_on:
       - postgre_db
+      - rabbitmq
       - redis
 
+  bookingservice.api:
+    container_name: booking-service
+    build:
+      context: .
+      dockerfile: src/BookingService/BookingService.API/Dockerfile
+    ports:
+      - "5001:8080"
+    networks:
+      - hotel-booking-dev
+    depends_on:
+      - postgre_db
+      - rabbitmq
+
   postgre_db:
-    container_name: postgres
+    container_name: postgres-db
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: hotel-service
+      POSTGRES_DB: hotel-service, booking-service
     ports:
       - "5432:5432"
     networks:
@@ -42,6 +56,19 @@ services:
     volumes:
       - redis-data:/data
 
+  rabbitmq:
+    container_name: rabbitmq-broker
+    image: rabbitmq:4.0-management
+    hostname: "bookings-queue"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - hotel-booking-dev
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
 volumes:
   postgres-data:
   redis-data:
+  rabbitmq-data:

@@ -6,7 +6,7 @@ using HotelService.Application.RequestHandlers.Commands.Hotel.Update;
 using HotelService.Application.RequestHandlers.Queries.Hotel.Get;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using HotelService.API.Contracts.Hotels;
+using HotelService.API.Requests.Hotels;
 using AutoMapper;
 
 namespace HotelService.API.Controllers
