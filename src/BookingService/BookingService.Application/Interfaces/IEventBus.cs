@@ -1,4 +1,4 @@
-﻿namespace BookingService.Infrastructure.Interfaces.MessageBroker
+﻿namespace BookingService.Application.Interfaces
 {
     public interface IEventBus
     {

@@ -35,20 +35,12 @@ namespace HotelService.Infrastructure.Files
             var fileName = Guid.NewGuid().ToString() + fileExtention;
             var fullPath = Path.Combine(_staticFilePath, fileName);
 
-            try
+            using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    await image.CopyToAsync(stream, cancellationToken);
-                }
-
-                return fullPath;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error when creating file {ex.Message}");
+                await image.CopyToAsync(stream, cancellationToken);
             }
 
+            return fullPath;
         }
 
         public async Task DeleteImageAsync(
@@ -58,14 +50,7 @@ namespace HotelService.Infrastructure.Files
             if (!File.Exists(imagePath))
                 throw new Exception("Invalid file path");
 
-            try
-            {
-                await Task.Run(() => File.Delete(imagePath), cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error when deleting file: {ex.Message}");
-            }
+            await Task.Run(() => File.Delete(imagePath), cancellationToken);
         }
     }
 }

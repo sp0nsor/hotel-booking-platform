@@ -40,7 +40,7 @@ namespace HotelService.Core.Models
 
         public bool Overlaps(BookingPeriod other)
         {
-            return StartDate < other.EndDate && other.StartDate < EndDate;
+            return StartDate < other.EndDate && other.StartDate < EndDate && Id != other.Id;
         }
     }
 }

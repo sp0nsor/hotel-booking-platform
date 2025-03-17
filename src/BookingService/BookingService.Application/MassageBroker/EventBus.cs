@@ -1,7 +1,7 @@
-﻿using BookingService.Infrastructure.Interfaces.MessageBroker;
+﻿using BookingService.Application.Interfaces;
 using MassTransit;
 
-namespace BookingService.Infrastructure.MassageBroker
+namespace BookingService.Application.MassageBroker
 {
     public class EventBus : IEventBus
     {

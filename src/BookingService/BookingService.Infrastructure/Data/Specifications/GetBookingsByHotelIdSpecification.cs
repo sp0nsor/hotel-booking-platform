@@ -3,13 +3,13 @@ using System.Linq.Expressions;
 
 namespace BookingService.Infrastructure.Data.Specifications
 {
-    public class GetHotelBookingsSpecification
+    public class GetBookingsByHotelIdSpecification
         : Specification<BookingEntity>
     {
         private readonly Guid _hotelId;
         private readonly bool? _isOutdated;
 
-        public GetHotelBookingsSpecification(
+        public GetBookingsByHotelIdSpecification(
             Guid hotelId,
             bool? isOutdated)
         {
