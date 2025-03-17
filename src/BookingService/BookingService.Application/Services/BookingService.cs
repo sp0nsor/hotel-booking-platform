@@ -5,9 +5,10 @@ using BookingService.Application.Requests;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Specifications;
 using BookingService.Infrastructure.Interfaces.Data;
-using BookingService.Infrastructure.Interfaces.MessageBroker;
+using BookingService.Infrastructure.Interfaces.Services;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using Hangfire;
 using Shared.Contracts.Bookings;
 
 namespace BookingService.Application.Services
@@ -16,6 +17,8 @@ namespace BookingService.Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IEventBus _eventBus;
+        private readonly IEmailService _emailService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IRepository<BookingEntity> _bookingRepository;
         private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
         private readonly IValidator<CreateBookingRequest> _createBookingRequestValidator;
@@ -23,13 +26,17 @@ namespace BookingService.Application.Services
         public BookingService(
             IMapper mapper,
             IEventBus eventBus,
+            IEmailService emailService,
+            IBackgroundJobClient backgroundJobClient,
             IRepository<BookingEntity> bookingRepository,
             IValidator<CreateBookingRequest> dataRequestValidator,
             IValidator<GetBookingsRequest> getBookingRequestValidator)
         {
             _mapper = mapper;
             _eventBus = eventBus;
+            _emailService = emailService;
             _bookingRepository = bookingRepository;
+            _backgroundJobClient = backgroundJobClient;
             _createBookingRequestValidator = dataRequestValidator;
             _getBookingRequestValidator = getBookingRequestValidator;
         }
@@ -52,7 +59,7 @@ namespace BookingService.Application.Services
                 cancellationToken);
 
             if (!validationResult.IsValid)
-            {
+            { 
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return Result.Failure(string.Join("; ", errors));
             }
@@ -60,7 +67,7 @@ namespace BookingService.Application.Services
             if(await HasBookingConflictAsync(
                 hotelId, 
                 roomId,
-                bookingRequest.StartDate, 
+                bookingRequest.StartDate,
                 bookingRequest.EndDate))
             {
                 return Result.Failure("Date conflict");
@@ -87,6 +94,24 @@ namespace BookingService.Application.Services
             var createBookingEvent = _mapper.Map<CreateBookingEvent>(bookingEntity);
 
             await _eventBus.PublishAsync(createBookingEvent, cancellationToken);
+
+            _backgroundJobClient.Enqueue(() =>
+               _emailService.SendEmailAsync(
+                    guestEmail,
+                    "Booking status",
+                    "Your booking was created successfully",
+                    CancellationToken.None
+               )
+            );
+
+            _backgroundJobClient.Schedule(() =>
+                CancelBookingAsync(
+                    userId,
+                    bookingEntity.Id,
+                    CancellationToken.None
+                ),
+                bookingEntity.EndDate
+            );
 
             return Result.Success();
         }
@@ -168,6 +193,18 @@ namespace BookingService.Application.Services
 
             await _eventBus.PublishAsync(cancelBookingEvent, cancellationToken);
 
+            //gRPC
+            string guestEmail = "mazie.zemlak@ethereal.email";
+
+            _backgroundJobClient.Enqueue(() =>
+                _emailService.SendEmailAsync(
+                guestEmail,
+                "Booking status",
+                "Your booking was cancelled successfully",
+                CancellationToken.None
+                )
+            );
+
             return Result.Success();
         }
 
@@ -188,6 +225,9 @@ namespace BookingService.Application.Services
 
             if (booking.UserId != userId)
                 return Result.Failure("Invalid operation");
+
+            if (booking.IsOutdated)
+                return Result.Failure("Booking already cancelled");
 
             var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,

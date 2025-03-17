@@ -2,6 +2,7 @@ using HotelService.API.Extensions;
 using HotelService.Application.Extensions;
 using HotelService.DataAccess.Extensions;
 using HotelService.Infrastructure.Extensions;
+using HotelService.Infrastructure.MessageBroker;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ services.AddControllers();
 
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
+
+services.Configure<MessageBrokerOptions>(configuration
+    .GetSection(nameof(MessageBrokerOptions)));
 
 services
     .AddApi()

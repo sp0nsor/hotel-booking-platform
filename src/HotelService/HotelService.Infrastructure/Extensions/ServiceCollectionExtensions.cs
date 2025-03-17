@@ -2,6 +2,7 @@
 using HotelService.Infrastructure.Caching;
 using HotelService.Infrastructure.Files;
 using HotelService.Infrastructure.Mappings;
+using HotelService.Infrastructure.MessageBroker;
 using HotelService.Infrastructure.MessageBroker.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -15,10 +16,15 @@ namespace HotelService.Infrastructure.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddAutoMapper(typeof(BookingProfile));
+            services.AddAutoMapper(typeof(CreateBookingProfile));
+            services.AddAutoMapper(typeof(UpdateBookingProfile));
+            services.AddAutoMapper(typeof(CancelBookingProfile));
 
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IImageService, ImageService>();
+
+            var messageBrokerOptions = configuration.GetSection(nameof(MessageBrokerOptions))
+                .Get<MessageBrokerOptions>();
 
             services.AddMassTransit(busConfiguration =>
             {
@@ -30,10 +36,10 @@ namespace HotelService.Infrastructure.Extensions
 
                 busConfiguration.UsingRabbitMq((ctx, cfg) =>
                 {
-                    cfg.Host(new Uri("amqp://guest:guest@bookings-queue:5672"), h =>
+                    cfg.Host(new Uri(messageBrokerOptions.Host), h =>
                     {
-                        h.Username("guest");
-                        h.Password("guest");
+                        h.Username(messageBrokerOptions.UserName);
+                        h.Password(messageBrokerOptions.Password);
                     });
 
                     cfg.ConfigureEndpoints(ctx);

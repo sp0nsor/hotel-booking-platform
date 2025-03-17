@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using BookingService.Infrastructure.Interfaces.Data;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Repositories;
-using BookingService.Infrastructure.MassageBroker;
-using MassTransit;
-using BookingService.Infrastructure.Interfaces.MessageBroker;
+using BookingService.Infrastructure.Services.EmailService;
+using BookingService.Infrastructure.Interfaces.Services;
+using MongoDB.Driver;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
+using Hangfire;
 
 namespace BookingService.Infrastructure.Extensions
 {
@@ -16,28 +20,33 @@ namespace BookingService.Infrastructure.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IRepository<BookingEntity>, Repository<BookingEntity>>();
+
             services.AddDbContext<BookingDbContext>(options =>
             {
                 options.UseNpgsql(configuration.GetConnectionString(nameof(BookingDbContext)));
             });
 
-            services.AddScoped<IRepository<BookingEntity>, Repository<BookingEntity>>();
+            var mongoUrl = MongoUrl.Create(configuration.GetConnectionString("HangfireDb"));
+            var mongoClient = new MongoClient(mongoUrl);
 
-            services.AddMassTransit(busConfiguration =>
+            var storageOptions = new MongoStorageOptions
             {
-                busConfiguration.SetKebabCaseEndpointNameFormatter();
-
-                busConfiguration.UsingRabbitMq((ctx, cfg) =>
+                MigrationOptions = new MongoMigrationOptions
                 {
-                    cfg.Host(new Uri("amqp://guest:guest@bookings-queue:5672"), h =>
-                    {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
-                });
+                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                    BackupStrategy = new NoneMongoBackupStrategy()
+                },
+                CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection
+            };
+
+            services.AddHangfire(options =>
+            {
+                options.UseMongoStorage(mongoClient, mongoUrl.DatabaseName, storageOptions);
             });
 
-            services.AddTransient<IEventBus, EventBus>();
+            services.AddHangfireServer();
 
             return services;
         }

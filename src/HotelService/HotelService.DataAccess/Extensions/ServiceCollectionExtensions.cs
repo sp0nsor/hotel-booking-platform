@@ -21,7 +21,7 @@ namespace HotelService.DataAccess.Extensions
             });
 
             services.AddScoped<IRepository<BookingPeriod>, Repository<BookingPeriod, BookingPeriodEntity>>();
-            services.AddScoped<IBookingRepository,  BookingRepository>();
+            services.AddScoped<IBookingPeriodRepository,  BookingPeriodRepository>();
             services.AddScoped<IRepository<Hotel>, Repository<Hotel, HotelEntity>>();
             services.AddScoped<IRepository<Room>, Repository<Room, RoomEntity>>();
             services.AddScoped<IRoomRepository, RoomRepository>();

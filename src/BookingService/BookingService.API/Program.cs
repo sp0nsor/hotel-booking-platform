@@ -1,6 +1,8 @@
 using BookingService.API.ExceptionHandling;
 using BookingService.Application.Extensions;
 using BookingService.Infrastructure.Extensions;
+using BookingService.Application.MassageBroker;
+using BookingService.Infrastructure.Services.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +15,14 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services
-    .AddApplication()
+    .AddApplication(configuration)
     .AddInfrastructure(configuration);
+
+services.Configure<EmailNotificationOptions>(configuration
+    .GetSection(nameof(EmailNotificationOptions)));
+
+services.Configure<MessageBrokerOptions>(configuration
+    .GetSection(nameof(MessageBrokerOptions)));
 
 services.AddExceptionHandler<GlobalExceptionHandler>();
 
