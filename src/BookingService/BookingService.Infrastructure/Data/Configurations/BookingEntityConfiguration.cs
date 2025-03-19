@@ -17,8 +17,34 @@ namespace BookingService.Infrastructure.Data.Configurations
             builder.Property(b => b.HotelId)
                 .IsRequired();
 
+            builder.Property(b => b.HotelName)
+                .IsRequired();
+
+            builder.Property(b => b.Country)
+                .IsRequired();
+
+            builder.Property(b => b.City)
+                .IsRequired();
+
+            builder.Property(b => b.Street)
+                .IsRequired();
+
             builder.Property(b => b.RoomId)
                 .IsRequired();
+
+            builder.Property(b => b.RoomNumber)
+                .IsRequired();
+
+            builder.Property(b => b.TotalPrice)
+                .IsRequired()
+                .HasPrecision(18, 2);
+
+            builder.Property(b => b.Currency)
+                .IsRequired();
+
+            builder.Property(b => b.IsOutdated)
+                .IsRequired()
+                .HasDefaultValue(false);
 
             builder.Property(b => b.GuestFirstName)
                 .IsRequired();
@@ -26,33 +52,26 @@ namespace BookingService.Infrastructure.Data.Configurations
             builder.Property(b => b.GuestLastName)
                 .IsRequired();
 
-            builder.Property(b => b.GuestEmail)
-                .IsRequired();
-
             builder.Property(b => b.GuestPhoneNumber)
                 .IsRequired();
 
-            builder.Property(b => b.IsOutdated)
-                .IsRequired()
-                .HasDefaultValue(false);
+            builder.Property(b => b.GuestEmail)
+                .IsRequired();
 
             builder.Property(b => b.StartDate)
                 .IsRequired()
                 .HasConversion(
                     p => p.ToUniversalTime(),
-                    p => DateTime.SpecifyKind(
-                        p,
-                        DateTimeKind.Utc));
+                    p => DateTime.SpecifyKind(p, DateTimeKind.Utc));
 
             builder.Property(b => b.EndDate)
                 .IsRequired()
                 .HasConversion(
                     p => p.ToUniversalTime(),
-                    p => DateTime.SpecifyKind(
-                        p,
-                        DateTimeKind.Utc));
+                    p => DateTime.SpecifyKind(p, DateTimeKind.Utc));
 
             builder.HasIndex(b => b.HotelId);
+            builder.HasIndex(b => b.UserId);
         }
     }
 }

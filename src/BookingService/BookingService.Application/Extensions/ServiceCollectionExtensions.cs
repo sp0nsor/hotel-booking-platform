@@ -16,9 +16,11 @@ namespace BookingService.Application.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddAutoMapper(typeof(BookingProfile));
+            services.AddAutoMapper(typeof(BookingEventProfile));
+            services.AddAutoMapper(typeof(BookingEntityProfile));
 
             services.AddScoped<IBookingService, Services.BookingService>();
+            services.AddScoped<IEventBus, EventBus>();
 
             services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
             services.AddScoped<IValidator<GetBookingsRequest>, GetBookingsRequestValidator>();
