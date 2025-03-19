@@ -16,29 +16,35 @@ namespace BookingService.Application.Services
     public class BookingService : IBookingService
     {
         private readonly IMapper _mapper;
-        private readonly IEventBus _eventBus;
         private readonly IEmailService _emailService;
-        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IEventBus _eventBus;
+        private readonly IHotelGrpcClient _hotelGrpcClient;
+        private readonly IRoomGrpcClient _roomGrpcClient;
         private readonly IRepository<BookingEntity> _bookingRepository;
         private readonly IValidator<GetBookingsRequest> _getBookingRequestValidator;
         private readonly IValidator<CreateBookingRequest> _createBookingRequestValidator;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public BookingService(
             IMapper mapper,
-            IEventBus eventBus,
             IEmailService emailService,
+            IValidator<GetBookingsRequest> getBookingRequestValidator,
             IBackgroundJobClient backgroundJobClient,
+            IHotelGrpcClient hotelGrpcClient,
+            IEventBus eventBus,
             IRepository<BookingEntity> bookingRepository,
             IValidator<CreateBookingRequest> dataRequestValidator,
-            IValidator<GetBookingsRequest> getBookingRequestValidator)
+            IRoomGrpcClient roomGrpcClient)
         {
+            _eventBus = eventBus; 
             _mapper = mapper;
-            _eventBus = eventBus;
             _emailService = emailService;
+            _createBookingRequestValidator = dataRequestValidator;
             _bookingRepository = bookingRepository;
             _backgroundJobClient = backgroundJobClient;
-            _createBookingRequestValidator = dataRequestValidator;
             _getBookingRequestValidator = getBookingRequestValidator;
+            _hotelGrpcClient = hotelGrpcClient;
+            _roomGrpcClient = roomGrpcClient;
         }
 
         public async Task<Result> CreateBookingAsync(
@@ -47,13 +53,6 @@ namespace BookingService.Application.Services
             CreateBookingRequest bookingRequest,
             CancellationToken cancellationToken)
         {
-            // gRPC logic
-            Guid userId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
-            string guestFirstName = "GuestFirstName";
-            string guestLastName = "GuestLastName";
-            string guestPhoneNumber = "GuestPhoneNumber";
-            string guestEmail = "mazie.zemlak@ethereal.email";
-
             var validationResult = await _createBookingRequestValidator.ValidateAsync(
                 bookingRequest,
                 cancellationToken);
@@ -70,34 +69,39 @@ namespace BookingService.Application.Services
                 bookingRequest.StartDate,
                 bookingRequest.EndDate))
             {
-                return Result.Failure("Date conflict");
+                return Result.Failure("This dates already booked");
             }
 
-            var bookingEntity = new BookingEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                HotelId = hotelId,
-                RoomId = roomId,
-                GuestFirstName = guestFirstName,
-                GuestLastName = guestLastName,
-                GuestPhoneNumber = guestPhoneNumber,
-                GuestEmail = guestEmail,
-                StartDate = bookingRequest.StartDate,
-                EndDate = bookingRequest.EndDate
-            };
+            var getHotelByIdResult = _hotelGrpcClient.GetHotelById(hotelId);
+
+            if (getHotelByIdResult.IsFailure)
+                return Result.Failure(getHotelByIdResult.Error);
+
+            var getRoomByIdResult = _roomGrpcClient.GetRoomById(roomId, hotelId);
+
+            if (getRoomByIdResult.IsFailure)
+                return Result.Failure(getRoomByIdResult.Error);
+
+            var booking = _mapper.Map<BookingEntity>((
+                getHotelByIdResult.Value,
+                getRoomByIdResult.Value, 
+                bookingRequest));
+
+            var numberOfDays = (booking.EndDate.Date - booking.StartDate.Date).Days;
+
+            booking.TotalPrice = (decimal)(numberOfDays * getRoomByIdResult.Value.MoneyAmount);
 
             await _bookingRepository.CreateAsync(
-                bookingEntity, 
+                booking, 
                 cancellationToken);
 
-            var createBookingEvent = _mapper.Map<CreateBookingEvent>(bookingEntity);
+            var createBookingEvent = _mapper.Map<CreateBookingEvent>(booking);
 
             await _eventBus.PublishAsync(createBookingEvent, cancellationToken);
 
             _backgroundJobClient.Enqueue(() =>
                _emailService.SendEmailAsync(
-                    guestEmail,
+                    booking.GuestEmail,
                     "Booking status",
                     "Your booking was created successfully",
                     CancellationToken.None
@@ -106,11 +110,11 @@ namespace BookingService.Application.Services
 
             _backgroundJobClient.Schedule(() =>
                 CancelBookingAsync(
-                    userId,
-                    bookingEntity.Id,
+                    booking.UserId,
+                    booking.Id,
                     CancellationToken.None
                 ),
-                bookingEntity.EndDate
+                booking.EndDate
             );
 
             return Result.Success();
@@ -193,12 +197,9 @@ namespace BookingService.Application.Services
 
             await _eventBus.PublishAsync(cancelBookingEvent, cancellationToken);
 
-            //gRPC
-            string guestEmail = "mazie.zemlak@ethereal.email";
-
             _backgroundJobClient.Enqueue(() =>
                 _emailService.SendEmailAsync(
-                guestEmail,
+                booking.GuestEmail,
                 "Booking status",
                 "Your booking was cancelled successfully",
                 CancellationToken.None

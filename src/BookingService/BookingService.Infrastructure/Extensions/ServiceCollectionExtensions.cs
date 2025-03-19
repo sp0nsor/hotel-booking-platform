@@ -11,6 +11,8 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using Hangfire;
+using BookingService.Infrastructure.Services.Grpc.Hotel;
+using BookingService.Infrastructure.Services.Grpc.Room;
 
 namespace BookingService.Infrastructure.Extensions
 {
@@ -22,6 +24,9 @@ namespace BookingService.Infrastructure.Extensions
         {
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IRepository<BookingEntity>, Repository<BookingEntity>>();
+
+            services.AddScoped<IHotelGrpcClient, HotelGrpcClient>();
+            services.AddScoped<IRoomGrpcClient, RoomGrpcClient>();
 
             services.AddDbContext<BookingDbContext>(options =>
             {

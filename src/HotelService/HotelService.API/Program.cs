@@ -1,8 +1,11 @@
 using HotelService.API.Extensions;
+using HotelService.API.Grpc.Hotel;
+using HotelService.API.Grpc.Room;
 using HotelService.Application.Extensions;
 using HotelService.DataAccess.Extensions;
 using HotelService.Infrastructure.Extensions;
 using HotelService.Infrastructure.MessageBroker;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +41,9 @@ services.AddProblemDetails();
 var app = builder.Build();
 
 app.MapControllers();
+
+app.MapGrpcService<HotelGrpcService>();
+app.MapGrpcService<RoomGrpcService>();
 
 app.UseExceptionHandler();
 
