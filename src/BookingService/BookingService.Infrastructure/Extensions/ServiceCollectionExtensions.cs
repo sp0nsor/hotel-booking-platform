@@ -51,7 +51,46 @@ namespace BookingService.Infrastructure.Extensions
                 options.UseMongoStorage(mongoClient, mongoUrl.DatabaseName, storageOptions);
             });
 
+            services
+                .AddGrpcClient<HotelService.HotelServiceClient>(options =>
+                {
+                    options.Address = new Uri("https://hotel-service:8081");
+                })
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback =
+                            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                    return handler;
+                });
+
+            services.AddGrpcClientWithCustomHandler<RoomService.RoomServiceClient>("https://hotel-service:8081");
+            services.AddGrpcClientWithCustomHandler<HotelService.HotelServiceClient>("https://hotel-service:8081");
+
             services.AddHangfireServer();
+
+            return services;
+        }
+
+        private static IServiceCollection AddGrpcClientWithCustomHandler<TClient>(
+            this IServiceCollection services, string serviceUrl)
+            where TClient : class
+        {
+            services.AddGrpcClient<TClient>(options =>
+            {
+                options.Address = new Uri(serviceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+                return handler;
+            });
 
             return services;
         }
