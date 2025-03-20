@@ -8,20 +8,9 @@ namespace BookingService.Infrastructure.Services.Grpc.Room
     {
         private readonly RoomService.RoomServiceClient _client;
 
-        public RoomGrpcClient()
+        public RoomGrpcClient(RoomService.RoomServiceClient client)
         {
-            var httpHandler = new HttpClientHandler();
-            httpHandler.ServerCertificateCustomValidationCallback =
-                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-
-            var channel = GrpcChannel.ForAddress(
-                "https://hotel-service:8081",
-                new GrpcChannelOptions
-                {
-                    HttpHandler = httpHandler
-                });
-
-            _client = new RoomService.RoomServiceClient(channel);
+            _client = client;
         }
 
         public Result<GetRoomByIdResponse> GetRoomById(Guid roomId, Guid hotelId)

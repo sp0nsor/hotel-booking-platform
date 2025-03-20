@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookingService.Application.DTOs;
 using BookingService.Application.Interfaces;
+using BookingService.Application.Mappings;
 using BookingService.Application.Requests;
 using BookingService.Infrastructure.Data.Entities;
 using BookingService.Infrastructure.Data.Specifications;
@@ -82,10 +83,14 @@ namespace BookingService.Application.Services
             if (getRoomByIdResult.IsFailure)
                 return Result.Failure(getRoomByIdResult.Error);
 
-            var booking = _mapper.Map<BookingEntity>((
-                getHotelByIdResult.Value,
-                getRoomByIdResult.Value, 
-                bookingRequest));
+            var bookingContext = new BookingContextData
+            {
+                Hotel = getHotelByIdResult.Value,
+                Room = getRoomByIdResult.Value,
+                Booking = bookingRequest
+            };
+
+            var booking = _mapper.Map<BookingEntity>(bookingContext);
 
             var numberOfDays = (booking.EndDate.Date - booking.StartDate.Date).Days;
 

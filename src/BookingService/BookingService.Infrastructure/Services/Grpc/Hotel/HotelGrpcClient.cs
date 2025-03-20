@@ -8,20 +8,9 @@ namespace BookingService.Infrastructure.Services.Grpc.Hotel
     {
         private readonly HotelService.HotelServiceClient _client;
 
-        public HotelGrpcClient()
+        public HotelGrpcClient(HotelService.HotelServiceClient client)
         {
-            var httpHandler = new HttpClientHandler();
-            httpHandler.ServerCertificateCustomValidationCallback = 
-                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-
-            var channel = GrpcChannel.ForAddress(
-                "https://hotel-service:8081",
-                new GrpcChannelOptions
-            {
-                HttpHandler = httpHandler
-            });
-
-            _client = new HotelService.HotelServiceClient(channel);
+            _client = client;
         }
 
         public Result<GetHotelByIdResponse> GetHotelById(Guid id)
