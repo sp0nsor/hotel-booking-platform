@@ -51,8 +51,6 @@ namespace BookingService.Infrastructure.Extensions
                 options.UseMongoStorage(mongoClient, mongoUrl.DatabaseName, storageOptions);
             });
 
-            
-
             services
                 .AddGrpcClient<HotelService.HotelServiceClient>(options =>
                 {

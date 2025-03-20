@@ -1,6 +1,5 @@
 ﻿using BookingService.Infrastructure.Interfaces.Services;
 using CSharpFunctionalExtensions;
-using Grpc.Net.Client;
 
 namespace BookingService.Infrastructure.Services.Grpc.Room
 {
