@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.70.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -30,5 +31,10 @@
     <ProjectReference Include="..\HotelService.DataAccess\HotelService.DataAccess.csproj" />
     <ProjectReference Include="..\HotelService.Infrastructure\HotelService.Infrastructure.csproj" />
   </ItemGroup>
+	
+	<ItemGroup>
+		<Protobuf Include="Grpc\Hotel\hotel.proto" GrpcServices="Server" />
+		<Protobuf Include="Grpc\Room\room.proto" GrpcServices="Server" />
+	</ItemGroup>
 
 </Project>

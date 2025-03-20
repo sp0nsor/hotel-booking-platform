@@ -3,6 +3,7 @@ using BookingService.Application.Extensions;
 using BookingService.Infrastructure.Extensions;
 using BookingService.Application.MassageBroker;
 using BookingService.Infrastructure.Services.EmailService;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 

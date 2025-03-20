@@ -18,7 +18,14 @@ namespace BookingService.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     HotelId = table.Column<Guid>(type: "uuid", nullable: false),
+                    HotelName = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Street = table.Column<string>(type: "text", nullable: false),
                     RoomId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoomNumber = table.Column<int>(type: "integer", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: false),
                     IsOutdated = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     GuestFirstName = table.Column<string>(type: "text", nullable: false),
                     GuestLastName = table.Column<string>(type: "text", nullable: false),
@@ -36,6 +43,11 @@ namespace BookingService.Infrastructure.Data.Migrations
                 name: "IX_Bookings_HotelId",
                 table: "Bookings",
                 column: "HotelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_UserId",
+                table: "Bookings",
+                column: "UserId");
         }
 
         /// <inheritdoc />

@@ -13,12 +13,16 @@ namespace HotelService.API.Extensions
                 Assembly.Load("HotelService.Application")
             };
 
+            services.AddGrpc();
+
             services.AddMediatR(x =>
                 x.RegisterServicesFromAssemblies(assembles));
 
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
             services.AddAutoMapper(typeof(RequestProfile));
+            services.AddAutoMapper(typeof(GetHotelByIdProfile));
+            services.AddAutoMapper(typeof(GetRoomByIdProfile));
 
             return services;
         }

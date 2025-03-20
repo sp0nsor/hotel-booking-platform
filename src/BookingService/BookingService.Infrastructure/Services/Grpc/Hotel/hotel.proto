@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "BookingService.Infrastructure.Services.Grpc.Hotel";
+
+service HotelService {
+	rpc GetHotelById (GetHotelByIdRequest) returns (GetHotelByIdResponse);
+}
+
+message GetHotelByIdResponse {
+	string hotelId = 1;
+	string name = 2;
+	string country = 3;
+	string city = 4;
+	string street = 5;
+	string errorMessage = 6;
+}
+
+message GetHotelByIdRequest {
+	string id = 1;
+}
