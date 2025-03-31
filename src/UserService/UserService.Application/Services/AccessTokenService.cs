@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserService.Application.Interfaces;
-using UserService.Application.Options;
+using UserService.Infrastructure.Options;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Interfaces.Services;
 
@@ -12,43 +12,25 @@ namespace UserService.Application.Services
 {
     public class AccessTokenService : IAccessTokenService
     {
-        public readonly AccessTokenOptions _options;
-        public readonly ICacheService _cacheService;
+        private readonly ITokenService _tokenService;
+        private readonly AccessTokenOptions _options;
+        private readonly ICacheService _cacheService;
 
         public AccessTokenService(
             ICacheService cacheService,
-            IOptions<AccessTokenOptions> options)
+            IOptions<AccessTokenOptions> options,
+            ITokenService tokenService)
         {
             _cacheService = cacheService;
             _options = options.Value;
+            _tokenService = tokenService;
         }
 
         public async Task<string> CreateAccessTokenAsync(
             UserEntity user,
             CancellationToken cancellationToken)
         {
-            var jwtTokenId = Guid.NewGuid().ToString();
-
-            var claims = new List<Claim>
-            {
-                new(JwtRegisteredClaimNames.Jti, jwtTokenId),
-                new(ClaimTypes.Role, user.Role.Name),
-                new(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
-
-            var credentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
-                SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                signingCredentials: credentials,
-                audience: _options.Audience,
-                issuer: _options.Issuer,
-                expires: DateTime.UtcNow.AddMinutes(
-                    _options.ExpiresMinutes));
-
-            var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+            var (jwtTokenId, tokenValue) = _tokenService.GenerateAccessToken(user);
 
             await _cacheService.SetAsync(
                 $"access_{jwtTokenId}",

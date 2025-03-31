@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
 using FluentValidation;
-using Microsoft.Extensions.Options;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Application.Requests;
@@ -9,7 +8,6 @@ using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Specifications;
 using UserService.Infrastructure.Interfaces.Data;
 using UserService.Infrastructure.Interfaces.Services;
-using UserService.Infrastructure.Options;
 
 namespace UserService.Application.Services
 {
@@ -68,14 +66,15 @@ namespace UserService.Application.Services
                     .Select(e => e.ErrorMessage)));
 
             var specification = new GetUserByEmailSpecification(registerUserRequest.Email);
-
-            var existUser = await _userRepository.GetSingleAsync(specification, cancellationToken);
+            var existUser = await _userRepository.GetSingleAsync(
+                specification, 
+                cancellationToken);
 
             if (existUser != null)
                 return Result.Failure("This user already exist");
 
             var passwordHash = _passwordHasher.Generate(registerUserRequest.Password);
-            
+
             var userEntity = _mapper.Map<UserEntity>(registerUserRequest);
 
             userEntity.PasswordHash = passwordHash;
@@ -111,8 +110,9 @@ namespace UserService.Application.Services
                     .Select(e => e.ErrorMessage)));
 
             var specification = new GetUserByEmailSpecification(loginUserRequest.Email);
-
-            var userEntity = await _userRepository.GetSingleAsync(specification, cancellationToken);
+            var userEntity = await _userRepository.GetSingleAsync(
+                specification,
+                cancellationToken);
 
             if (userEntity is null)
                 return Result.Failure<LoginDto>("This user dosen`t exist");
@@ -155,7 +155,6 @@ namespace UserService.Application.Services
                 return Result.Failure("Invalid confirm code");
 
             var specification = new GetUserByIdSpecification(storedUserId);
-
             var userEntity = await _userRepository.GetSingleAsync(
                 specification,
                 cancellationToken);
@@ -181,7 +180,6 @@ namespace UserService.Application.Services
                 return Result.Failure<LoginDto>("You need to re-login");
 
             var specification = new GetUserByIdSpecification(refreshTokenEntity.UserId);
-
             var userEntity = await _userRepository.GetSingleAsync(
                 specification,
                 cancellationToken);
@@ -193,9 +191,9 @@ namespace UserService.Application.Services
                 userEntity,
                 cancellationToken);
 
-            var newRefreshTokenValue = refreshTokenEntity.Expires > DateTime.UtcNow
-                ? refreshTokenEntity.Value
-                : await _refreshTokenService.CreateResreshTokenAsync(userEntity.Id, cancellationToken);
+            var newRefreshTokenValue = await _refreshTokenService.CreateResreshTokenAsync(
+                userEntity.Id, 
+                cancellationToken);
 
             return Result.Success(new LoginDto(newRefreshTokenValue, newAccessTokenValue));
         }
@@ -229,7 +227,6 @@ namespace UserService.Application.Services
                     .Select(e => e.ErrorMessage)));
 
             var specification = new GetUserByIdSpecification(userId);
-
             var userEntity = await _userRepository.GetSingleAsync(
                 specification,
                 cancellationToken);

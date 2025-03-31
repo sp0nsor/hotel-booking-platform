@@ -26,6 +26,7 @@ namespace UserService.Infrastructure.Extensions
                 options.InstanceName = "local";
             });
 
+            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IRepository<UserEntity>, Repository<UserEntity>>();
             services.AddScoped<IRepository<RefreshTokenEntity>, Repository<RefreshTokenEntity>>();
 

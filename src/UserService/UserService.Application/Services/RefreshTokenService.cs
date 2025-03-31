@@ -1,31 +1,34 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
 using UserService.Application.Interfaces;
-using UserService.Application.Options;
+using UserService.Infrastructure.Options;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Specifications;
 using UserService.Infrastructure.Interfaces.Data;
+using UserService.Infrastructure.Interfaces.Services;
 
 namespace UserService.Application.Services
 {
     public class RefreshTokenService : IRefreshTokenService
     {
+        private readonly ITokenService _tokenService;
         private readonly RefreshTokenOptions _options;
         private readonly IRepository<RefreshTokenEntity> _repository;
 
         public RefreshTokenService(
             IOptions<RefreshTokenOptions> options,
-            IRepository<RefreshTokenEntity> repository)
+            IRepository<RefreshTokenEntity> repository,
+            ITokenService tokenService)
         {
             _options = options.Value;
             _repository = repository;
+            _tokenService = tokenService;
         }
 
         public async Task<string> CreateResreshTokenAsync(
             Guid userId,
             CancellationToken cancellationToken)
         {
-            var value = GenerateValue();
+            var value = _tokenService.GenerateRefreshToken();
 
             var entity = new RefreshTokenEntity
             {
@@ -47,7 +50,6 @@ namespace UserService.Application.Services
             CancellationToken cancellationToken)
         {
             var specification = new GetRefreshTokenByValueSpecification(refreshTokenValue);
-
             var tokenEntity = await _repository.GetSingleAsync(
                 specification,
                 cancellationToken);
@@ -65,21 +67,11 @@ namespace UserService.Application.Services
             CancellationToken cancellationToken)
         {
             var specification = new GetRefreshTokenByValueSpecification(value);
-
             var tokenEntity = await _repository.GetSingleAsync(
                 specification,
                 cancellationToken);
 
             return tokenEntity;
-        }
-
-        private string GenerateValue()
-        {
-            var randomBytes = new byte[_options.TokenLength];
-
-            RandomNumberGenerator.Fill(randomBytes);
-
-            return Convert.ToBase64String(randomBytes);
         }
     }
 }

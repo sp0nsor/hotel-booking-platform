@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using UserService.Application.Options;
+using UserService.Infrastructure.Options;
 
 namespace UserService.API.Extensions
 {
@@ -13,79 +13,58 @@ namespace UserService.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            var tokenOptions = configuration
+            var accessTokenOptions = configuration
                 .GetSection(nameof(AccessTokenOptions))
-                    .Get<AccessTokenOptions>();
+                .Get<AccessTokenOptions>();
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = true;
-                options.SaveToken = true;
-
-                options.TokenValidationParameters = new TokenValidationParameters
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = tokenOptions.Issuer,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                        .GetBytes(tokenOptions.SecretKey)),
-                    ClockSkew = TimeSpan.Zero
-
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
+                    options.RequireHttpsMetadata = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        var accessToken = context.Request.Headers["Authorization"]
-                            .FirstOrDefault()?.Split(" ").Last();
+                        ValidateIssuer = true,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = accessTokenOptions.Issuer,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(accessTokenOptions.SecretKey)),
+                        ClockSkew = TimeSpan.Zero
+                    };
 
-                        if (!string.IsNullOrEmpty(accessToken))
-                            context.Token = accessToken;
-
-                        Console.WriteLine(accessToken);
-
-                        return Task.CompletedTask;
-                    },
-
-                    OnTokenValidated = async context =>
+                    options.Events = new JwtBearerEvents
                     {
-                        var accessToken = context.Request.Headers["Authorization"]
-                            .FirstOrDefault()?.Split(" ").Last();
-
-                        if (new JwtSecurityTokenHandler().ReadJwtToken(accessToken) is JwtSecurityToken jwtToken)
+                        OnTokenValidated = async context =>
                         {
-                            var cache = context.HttpContext.RequestServices.GetRequiredService<IDistributedCache>();
+                            using var scope = context.HttpContext.RequestServices.CreateScope();
+                            var cache = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
 
-                            var jwtTokenId = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+                            var accessToken = context.Request.Headers["Authorization"]
+                                .FirstOrDefault()?.Split(" ").Last();
 
-                            var existToken = await cache.GetStringAsync($"access_{jwtTokenId}");
+                            if (!string.IsNullOrEmpty(accessToken))
+                            {
+                                var jwtTokenHandler = new JwtSecurityTokenHandler();
+                                var jwtToken = jwtTokenHandler.ReadJwtToken(accessToken);
 
-                            if (string.IsNullOrEmpty(existToken))
-                                throw new SecurityTokenException("Invalid token");
+                                var jwtTokenId = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
 
+                                if (string.IsNullOrEmpty(jwtTokenId) ||
+                                    string.IsNullOrEmpty(await cache.GetStringAsync($"access_{jwtTokenId}")))
+                                    throw new SecurityTokenException("Invalid token");
+                            }
                         }
-                    }
-                };
-            });
+                    };
+                });
 
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminPolicy", policy =>
-                    policy.RequireRole("Admin")
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme));
+                    policy.RequireRole("Admin"));
 
                 options.AddPolicy("UserPolicy", policy =>
-                    policy.RequireRole("User")
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme));
+                    policy.RequireRole("User"));
             });
 
             return services;

@@ -1,4 +1,4 @@
-﻿namespace UserService.Application.Options
+﻿namespace UserService.Infrastructure.Options
 {
     public class AccessTokenOptions
     {

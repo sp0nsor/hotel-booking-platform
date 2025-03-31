@@ -1,8 +1,8 @@
 using UserService.API.Extensions;
 using UserService.Application.Extensions;
-using UserService.Application.Options;
-using UserService.Infrastructure.Extensions;
 using UserService.Infrastructure.Options;
+using UserService.Infrastructure.Extensions;
+using UserService.API.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,6 @@ services.AddControllers();
 services
     .AddApplication()
     .AddInfrastructure(configuration);
-
 
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
@@ -33,6 +32,8 @@ services.Configure<EmailOptions>(configuration
 services.Configure<ConfirmCodeOptions>(configuration
     .GetSection(nameof(ConfirmCodeOptions)));
 
+services.AddExceptionHandler<GlobalExceptionHandler>();
+
 services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -43,9 +44,13 @@ services.AddCors(options =>
     });
 });
 
+services.AddProblemDetails();
+
 var app = builder.Build();
 
 app.ApplyMigrations();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
