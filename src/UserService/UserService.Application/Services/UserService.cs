@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using Hangfire;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Application.Requests;
@@ -13,6 +14,7 @@ namespace UserService.Application.Services
 {
     public class UserService : IUserService
     {
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IAccessTokenService _accessTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IValidator<UpdateUserInfoRequest> _updateRequestValidator;
@@ -38,7 +40,8 @@ namespace UserService.Application.Services
             IValidator<ConfirmUserRequest> confirmRequestValidator,
             IValidator<LoginUserRequest> loginRequestValidator,
             IRefreshTokenService refreshTokenService,
-            IAccessTokenService accessTokenService)
+            IAccessTokenService accessTokenService,
+            IBackgroundJobClient backgroundJobClient)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -52,6 +55,7 @@ namespace UserService.Application.Services
             _loginRequestValidator = loginRequestValidator;
             _refreshTokenService = refreshTokenService;
             _accessTokenService = accessTokenService;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         public async Task<Result> RegisterUserAsync(
@@ -83,11 +87,14 @@ namespace UserService.Application.Services
                 userEntity.Id,
                 cancellationToken);
 
-            await _emailService.SendEmailAsync(
-                userEntity.Email,
-                "Confirm code", 
-                confirmCode, 
-                cancellationToken);
+            _backgroundJobClient.Enqueue(() =>
+                _emailService.SendEmailAsync(
+                    userEntity.Email,
+                    "Confirm code",
+                    confirmCode,
+                    cancellationToken
+                )
+            );
 
             userEntity.IsActivated = false;
 
