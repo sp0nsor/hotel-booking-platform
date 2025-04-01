@@ -60,7 +60,10 @@ namespace BookingService.API.Controllers
             [FromBody] CreateBookingRequest bookingRequest, 
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var result = await _bookingsService.CreateBookingAsync(
+                Guid.Parse(userId),
                 hotelId,
                 roomId,
                 bookingRequest,

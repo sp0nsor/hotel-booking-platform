@@ -19,6 +19,7 @@ namespace BookingService.Application.Services
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IEventBus _eventBus;
+        private readonly IUserGrpcClient _userGrpcClient;
         private readonly IHotelGrpcClient _hotelGrpcClient;
         private readonly IRoomGrpcClient _roomGrpcClient;
         private readonly IRepository<BookingEntity> _bookingRepository;
@@ -35,9 +36,10 @@ namespace BookingService.Application.Services
             IEventBus eventBus,
             IRepository<BookingEntity> bookingRepository,
             IValidator<CreateBookingRequest> dataRequestValidator,
-            IRoomGrpcClient roomGrpcClient)
+            IRoomGrpcClient roomGrpcClient,
+            IUserGrpcClient userGrpcClient)
         {
-            _eventBus = eventBus; 
+            _eventBus = eventBus;
             _mapper = mapper;
             _emailService = emailService;
             _createBookingRequestValidator = dataRequestValidator;
@@ -46,9 +48,11 @@ namespace BookingService.Application.Services
             _getBookingRequestValidator = getBookingRequestValidator;
             _hotelGrpcClient = hotelGrpcClient;
             _roomGrpcClient = roomGrpcClient;
+            _userGrpcClient = userGrpcClient;
         }
 
         public async Task<Result> CreateBookingAsync(
+            Guid userId,
             Guid hotelId,
             Guid roomId,
             CreateBookingRequest bookingRequest,
@@ -83,8 +87,14 @@ namespace BookingService.Application.Services
             if (getRoomByIdResult.IsFailure)
                 return Result.Failure(getRoomByIdResult.Error);
 
+            var getUserByIdResult = _userGrpcClient.GetUserById(userId);
+
+            if (getUserByIdResult.IsFailure)
+                return Result.Failure(getUserByIdResult.Error);
+
             var bookingContext = new BookingContextData
             {
+                User = getUserByIdResult.Value,
                 Hotel = getHotelByIdResult.Value,
                 Room = getRoomByIdResult.Value,
                 Booking = bookingRequest

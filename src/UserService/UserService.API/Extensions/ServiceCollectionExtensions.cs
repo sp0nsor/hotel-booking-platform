@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using UserService.API.Mappings;
 using UserService.Infrastructure.Options;
 
 namespace UserService.API.Extensions
@@ -57,6 +58,25 @@ namespace UserService.API.Extensions
                         }
                     };
                 });
+
+            return services;
+        }
+
+        public static IServiceCollection AddApi(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
+            services.AddAutoMapper(typeof(GetUserByIdProfile));
+
+            services.AddGrpc();
 
             return services;
         }

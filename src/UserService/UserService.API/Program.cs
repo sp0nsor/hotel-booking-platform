@@ -3,6 +3,7 @@ using UserService.Application.Extensions;
 using UserService.Infrastructure.Options;
 using UserService.Infrastructure.Extensions;
 using UserService.API.ExceptionHandling;
+using UserService.API.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ var configuration = builder.Configuration;
 services.AddControllers();
 
 services
+    .AddApi()
     .AddApplication()
     .AddInfrastructure(configuration);
 
@@ -34,16 +36,6 @@ services.Configure<ConfirmCodeOptions>(configuration
 
 services.AddExceptionHandler<GlobalExceptionHandler>();
 
-services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
-
 services.AddProblemDetails();
 
 var app = builder.Build();
@@ -65,5 +57,7 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.MapControllers();
+
+app.MapGrpcService<UserGrpcService>();
 
 app.Run();

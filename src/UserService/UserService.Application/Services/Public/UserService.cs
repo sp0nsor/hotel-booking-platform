@@ -59,6 +59,21 @@ namespace UserService.Application.Services.Public
             _backgroundJobClient = backgroundJobClient;
         }
 
+        public async Task<Result<UserDto>> GetUserByIdAsync(
+            Guid id, 
+            CancellationToken cancellationToken)
+        {
+            var specification = new GetUserByIdSpecification(id);
+            var existUser = await _userRepository.GetSingleAsync(
+                specification, 
+                cancellationToken);
+
+            if (existUser is null)
+                return Result.Failure<UserDto>("User not foud");
+
+            return _mapper.Map<UserDto>(existUser);
+        }
+
         public async Task<Result> RegisterUserAsync(
             RegisterUserRequest registerUserRequest,
             CancellationToken cancellationToken)
