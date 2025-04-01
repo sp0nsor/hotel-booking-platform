@@ -2,7 +2,7 @@
 using UserService.Application.DTOs;
 using UserService.Application.Requests;
 
-namespace UserService.Application.Interfaces
+namespace UserService.Application.Interfaces.Public
 {
     public interface IUserService
     {

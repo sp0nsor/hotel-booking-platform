@@ -2,7 +2,7 @@
 
 namespace UserService.Infrastructure.Services
 {
-    public class PasswordHasher : IPasswordHasher
+    public class PasswordService : IPasswordService
     {
         public string Generate(string password) =>
             BCrypt.Net.BCrypt.EnhancedHashPassword(password);

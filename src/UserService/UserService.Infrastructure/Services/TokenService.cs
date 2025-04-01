@@ -42,7 +42,6 @@ namespace UserService.Infrastructure.Services
             var token = new JwtSecurityToken(
                 claims: claims,
                 signingCredentials: credentials,
-                audience: _accessTokenOptions.Audience,
                 issuer: _accessTokenOptions.Issuer,
                 expires: DateTime.UtcNow.AddMinutes(
                     _accessTokenOptions.ExpiresMinutes));

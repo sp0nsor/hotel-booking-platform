@@ -1,6 +1,8 @@
 ﻿using BookingService.Application.Interfaces;
 using BookingService.Application.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookingService.API.Controllers
 {
@@ -15,6 +17,7 @@ namespace BookingService.API.Controllers
             _bookingsService = bookingsService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("hotels/{hotelId}/bookings")]
         public async Task<ActionResult> GetBookingsByHotelId(
             [FromRoute] Guid hotelId,
@@ -31,14 +34,16 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpGet("users/{userId}/bookings")]
+        [Authorize]
+        [HttpGet("users/me/bookings")]
         public async Task<ActionResult> GetBookingsByUserId(
-            [FromRoute] Guid userId, 
             [FromQuery] GetBookingsRequest getBookingsRequest, 
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var result = await _bookingsService.GetBookingsByUserIdAsync(
-                userId,
+                Guid.Parse(userId),
                 getBookingsRequest,
                 cancellationToken);
 
@@ -47,6 +52,7 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
+        [Authorize]
         [HttpPost("hotels/{hotelId}/rooms/{roomId}/bookings")]
         public async Task<ActionResult> CreateBooking(
             [FromRoute] Guid hotelId,
@@ -65,15 +71,17 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpPut("users/{userId}/bookings/{bookingId}")]
+        [Authorize]
+        [HttpPut("users/me/bookings/{bookingId}")]
         public async Task<ActionResult> UpdateBooking(
-            [FromRoute] Guid userId,
             [FromRoute] Guid bookingId,
             [FromBody] CreateBookingRequest bookingRequest,
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var result = await _bookingsService.UpdateBookingAsync(
-                userId,
+                Guid.Parse(userId),
                 bookingId,
                 bookingRequest,
                 cancellationToken);
@@ -83,14 +91,16 @@ namespace BookingService.API.Controllers
                 : BadRequest(result.Error);
         }
 
-        [HttpPatch("users/{userId}/bookings/{bookingId}/cancelled")]
+        [Authorize]
+        [HttpPatch("users/me/bookings/{bookingId}/cancelled")]
         public async Task<ActionResult> CancelBooking(
-            [FromRoute] Guid userId,
             [FromRoute] Guid bookingId,
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var result = await _bookingsService.CancelBookingAsync(
-                userId,
+                Guid.Parse(userId),
                 bookingId,
                 cancellationToken);
 

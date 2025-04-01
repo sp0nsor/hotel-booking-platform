@@ -1,6 +1,6 @@
 ﻿using UserService.Infrastructure.Data.Entities;
 
-namespace UserService.Application.Interfaces
+namespace UserService.Application.Interfaces.Internal
 {
     public interface IAccessTokenService
     {

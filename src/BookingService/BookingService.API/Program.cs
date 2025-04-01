@@ -4,11 +4,14 @@ using BookingService.Infrastructure.Extensions;
 using BookingService.Application.MassageBroker;
 using BookingService.Infrastructure.Services.EmailService;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using BookingService.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 var configuration = builder.Configuration;
+
+services.AddJwtAuthentication(configuration);
 
 services.AddControllers();
 
@@ -52,6 +55,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

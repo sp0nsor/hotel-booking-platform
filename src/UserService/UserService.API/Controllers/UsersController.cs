@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UserService.API.Extensions;
-using UserService.Application.Interfaces;
+using UserService.Application.Interfaces.Public;
 using UserService.Application.Requests;
 
 namespace UserService.API.Controllers

@@ -55,10 +55,9 @@ namespace UserService.Infrastructure.Extensions
             services.AddScoped<IRepository<UserEntity>, Repository<UserEntity>>();
             services.AddScoped<IRepository<RefreshTokenEntity>, Repository<RefreshTokenEntity>>();
 
-            services.AddScoped<IConfirmCodeService, ConfirmCodeService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ICacheService, CacheService>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IPasswordService, PasswordService>();
 
             return services;
         }

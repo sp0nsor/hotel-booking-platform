@@ -1,4 +1,4 @@
-﻿namespace UserService.Infrastructure.Interfaces.Services
+﻿namespace UserService.Application.Interfaces.Internal
 {
     public interface IConfirmCodeService
     {

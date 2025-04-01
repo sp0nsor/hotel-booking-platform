@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
-using UserService.Application.Interfaces;
 using UserService.Infrastructure.Options;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Specifications;
 using UserService.Infrastructure.Interfaces.Data;
 using UserService.Infrastructure.Interfaces.Services;
+using UserService.Application.Interfaces.Internal;
 
-namespace UserService.Application.Services
+namespace UserService.Application.Services.Internal
 {
     public class RefreshTokenService : IRefreshTokenService
     {
@@ -46,7 +46,7 @@ namespace UserService.Application.Services
         }
 
         public async Task DeleteTokenAsync(
-            string refreshTokenValue, 
+            string refreshTokenValue,
             CancellationToken cancellationToken)
         {
             var specification = new GetRefreshTokenByValueSpecification(refreshTokenValue);
@@ -58,7 +58,7 @@ namespace UserService.Application.Services
                 return;
 
             await _repository.DeleteAsync(
-                tokenEntity, 
+                tokenEntity,
                 cancellationToken);
         }
 

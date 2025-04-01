@@ -1,40 +1,16 @@
-﻿using HotelService.API.ExceptionHandling;
-using HotelService.API.Mappings;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Text;
 
-namespace HotelService.API.Extensions
+namespace BookingService.API.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddApi(this IServiceCollection services)
-        {
-            var assembles = new[]
-            {
-                Assembly.Load("HotelService.Application")
-            };
-
-            services.AddGrpc();
-
-            services.AddMediatR(x =>
-                x.RegisterServicesFromAssemblies(assembles));
-
-            services.AddExceptionHandler<GlobalExceptionHandler>();
-
-            services.AddAutoMapper(typeof(RequestProfile));
-            services.AddAutoMapper(typeof(GetHotelByIdProfile));
-            services.AddAutoMapper(typeof(GetRoomByIdProfile));
-
-            return services;
-        }
-
         public static IServiceCollection AddJwtAuthentication(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration) 
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

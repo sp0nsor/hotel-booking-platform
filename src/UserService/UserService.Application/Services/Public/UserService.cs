@@ -3,14 +3,15 @@ using CSharpFunctionalExtensions;
 using FluentValidation;
 using Hangfire;
 using UserService.Application.DTOs;
-using UserService.Application.Interfaces;
+using UserService.Application.Interfaces.Internal;
+using UserService.Application.Interfaces.Public;
 using UserService.Application.Requests;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Specifications;
 using UserService.Infrastructure.Interfaces.Data;
 using UserService.Infrastructure.Interfaces.Services;
 
-namespace UserService.Application.Services
+namespace UserService.Application.Services.Public
 {
     public class UserService : IUserService
     {
@@ -25,12 +26,12 @@ namespace UserService.Application.Services
         private readonly IEmailService _emailService;
         private readonly ICacheService _cacheService;
         private readonly IRepository<UserEntity> _userRepository;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly IPasswordService _passwordService;
         private readonly IMapper _mapper;
 
         public UserService(
             IRepository<UserEntity> userRepository,
-            IPasswordHasher passwordHasher,
+            IPasswordService passwordService,
             IMapper mapper,
             ICacheService cacheService,
             IEmailService emailService,
@@ -44,7 +45,7 @@ namespace UserService.Application.Services
             IBackgroundJobClient backgroundJobClient)
         {
             _userRepository = userRepository;
-            _passwordHasher = passwordHasher;
+            _passwordService = passwordService;
             _mapper = mapper;
             _cacheService = cacheService;
             _emailService = emailService;
@@ -71,13 +72,13 @@ namespace UserService.Application.Services
 
             var specification = new GetUserByEmailSpecification(registerUserRequest.Email);
             var existUser = await _userRepository.GetSingleAsync(
-                specification, 
+                specification,
                 cancellationToken);
 
             if (existUser != null)
                 return Result.Failure("This user already exist");
 
-            var passwordHash = _passwordHasher.Generate(registerUserRequest.Password);
+            var passwordHash = _passwordService.Generate(registerUserRequest.Password);
 
             var userEntity = _mapper.Map<UserEntity>(registerUserRequest);
 
@@ -127,7 +128,7 @@ namespace UserService.Application.Services
             if (!userEntity.IsActivated)
                 return Result.Failure<LoginDto>("This user isn`t confirm");
 
-            if(!_passwordHasher.Verify(
+            if (!_passwordService.Verify(
                     loginUserRequest.Password,
                     userEntity.PasswordHash))
                 return Result.Failure<LoginDto>("Invalid password");
@@ -137,7 +138,7 @@ namespace UserService.Application.Services
                 cancellationToken);
 
             var accessTokenValue = await _accessTokenService.CreateAccessTokenAsync(
-                userEntity, 
+                userEntity,
                 cancellationToken);
 
             return new LoginDto(refreshTokenValue, accessTokenValue);
@@ -155,7 +156,7 @@ namespace UserService.Application.Services
                     .Select(e => e.ErrorMessage)));
 
             var storedUserId = await _confirmCodeService.ConfirmCodeAsync(
-                confirmUserRequest.ConfirmCode, 
+                confirmUserRequest.ConfirmCode,
                 cancellationToken);
 
             if (storedUserId == Guid.Empty)
@@ -169,7 +170,7 @@ namespace UserService.Application.Services
             userEntity.IsActivated = true;
 
             await _userRepository.UpdateAsync(
-                userEntity, 
+                userEntity,
                 cancellationToken);
 
             return Result.Success();
@@ -199,7 +200,7 @@ namespace UserService.Application.Services
                 cancellationToken);
 
             var newRefreshTokenValue = await _refreshTokenService.CreateResreshTokenAsync(
-                userEntity.Id, 
+                userEntity.Id,
                 cancellationToken);
 
             return Result.Success(new LoginDto(newRefreshTokenValue, newAccessTokenValue));
@@ -207,7 +208,7 @@ namespace UserService.Application.Services
 
         public async Task<Result> LogoutUserAsync(
             string jwtTokenId,
-            string refreshTokenValue, 
+            string refreshTokenValue,
             CancellationToken cancellationToken)
         {
             await _refreshTokenService.DeleteTokenAsync(

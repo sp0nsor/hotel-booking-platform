@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
+using UserService.Application.Interfaces.Internal;
 using UserService.Infrastructure.Interfaces.Services;
 using UserService.Infrastructure.Options;
 
-namespace UserService.Infrastructure.Services
+namespace UserService.Application.Services.Internal
 {
     public class ConfirmCodeService : IConfirmCodeService
     {
@@ -38,11 +39,11 @@ namespace UserService.Infrastructure.Services
             string code,
             CancellationToken cancellationToken)
         {
-            var storedUserId= await _cacheService.GetAsync<string>(
+            var storedUserId = await _cacheService.GetAsync<string>(
                 $"confirm_code_{code}",
                 cancellationToken);
 
-            if(string.IsNullOrEmpty(storedUserId))
+            if (string.IsNullOrEmpty(storedUserId))
                 return Guid.Empty;
 
             await _cacheService.DeleteAsync(

@@ -1,6 +1,6 @@
 ﻿namespace UserService.Infrastructure.Interfaces.Services
 {
-    public interface IPasswordHasher
+    public interface IPasswordService
     {
         string Generate(string password);
         bool Verify(string password, string passwordHash);

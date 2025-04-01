@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace HotelService.API.ExceptionHandling
@@ -11,14 +12,23 @@ namespace HotelService.API.ExceptionHandling
             Exception exception,
             CancellationToken cancellationToken)
         {
-            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-            var problemDetails = new ProblemDetails()
+            var problemDetails = exception switch
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Server Error",
-                Detail = exception.Message
+                SecurityTokenException => new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = "You need to re-login"
+                },
+                _ => new ProblemDetails
+                {
+                    Status = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = exception.Message
+                }
             };
+
+            httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 
             await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 

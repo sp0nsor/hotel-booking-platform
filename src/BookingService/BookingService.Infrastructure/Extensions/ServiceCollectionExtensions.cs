@@ -33,6 +33,12 @@ namespace BookingService.Infrastructure.Extensions
                 options.UseNpgsql(configuration.GetConnectionString(nameof(BookingDbContext)));
             });
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("Redis");
+                options.InstanceName = "local";
+            });
+
             var mongoUrl = MongoUrl.Create(configuration.GetConnectionString("HangfireDb"));
             var mongoClient = new MongoClient(mongoUrl);
 
