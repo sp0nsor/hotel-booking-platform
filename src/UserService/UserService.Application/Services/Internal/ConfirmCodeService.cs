@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using UserService.Application.Interfaces.Internal;
-using UserService.Infrastructure.Interfaces.Services;
-using UserService.Infrastructure.Options;
+using UserService.Application.Options;
 
 namespace UserService.Application.Services.Internal
 {

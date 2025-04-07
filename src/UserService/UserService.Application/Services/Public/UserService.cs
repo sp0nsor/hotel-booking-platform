@@ -9,7 +9,6 @@ using UserService.Application.Requests;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Specifications;
 using UserService.Infrastructure.Interfaces.Data;
-using UserService.Infrastructure.Interfaces.Services;
 
 namespace UserService.Application.Services.Public
 {
@@ -91,7 +90,7 @@ namespace UserService.Application.Services.Public
                 cancellationToken);
 
             if (existUser != null)
-                return Result.Failure("This user already exist");
+                return Result.Failure("The user with this email already exists");
 
             var passwordHash = _passwordService.Generate(registerUserRequest.Password);
 
@@ -140,13 +139,11 @@ namespace UserService.Application.Services.Public
             if (userEntity is null)
                 return Result.Failure<LoginDto>("This user dosen`t exist");
 
-            if (!userEntity.IsActivated)
-                return Result.Failure<LoginDto>("This user isn`t confirm");
-
-            if (!_passwordService.Verify(
+            if (!userEntity.IsActivated ||
+                !_passwordService.Verify(
                     loginUserRequest.Password,
                     userEntity.PasswordHash))
-                return Result.Failure<LoginDto>("Invalid password");
+                return Result.Failure<LoginDto>("Something went wrong");
 
             var refreshTokenValue = await _refreshTokenService.CreateResreshTokenAsync(
                 userEntity.Id,

@@ -1,7 +1,7 @@
 ﻿using BookingService.Application.Requests;
-using BookingService.Infrastructure.Services.Grpc.Hotel;
-using BookingService.Infrastructure.Services.Grpc.Room;
-using BookingService.Infrastructure.Services.Grpc.User;
+using BookingService.Application.Services.Internal.Grpc.Hotel;
+using BookingService.Application.Services.Internal.Grpc.Room;
+using BookingService.Application.Services.Internal.Grpc.User;
 
 namespace BookingService.Application.Mappings
 {

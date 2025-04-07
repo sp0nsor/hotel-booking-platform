@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using UserService.Infrastructure.Options;
+using UserService.Application.Options;
 using UserService.Infrastructure.Data.Entities;
-using UserService.Infrastructure.Interfaces.Services;
 using UserService.Application.Interfaces.Internal;
 
 namespace UserService.Application.Services.Internal

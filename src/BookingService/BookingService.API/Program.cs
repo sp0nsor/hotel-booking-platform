@@ -1,10 +1,9 @@
 using BookingService.API.ExceptionHandling;
 using BookingService.Application.Extensions;
 using BookingService.Infrastructure.Extensions;
-using BookingService.Application.MassageBroker;
-using BookingService.Infrastructure.Services.EmailService;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using BookingService.API.Extensions;
+using BookingService.Application.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,8 +21,8 @@ services
     .AddApplication(configuration)
     .AddInfrastructure(configuration);
 
-services.Configure<EmailNotificationOptions>(configuration
-    .GetSection(nameof(EmailNotificationOptions)));
+services.Configure<EmailOptions>(configuration
+    .GetSection(nameof(EmailOptions)));
 
 services.Configure<MessageBrokerOptions>(configuration
     .GetSection(nameof(MessageBrokerOptions)));

@@ -1,6 +1,6 @@
 using UserService.API.Extensions;
 using UserService.Application.Extensions;
-using UserService.Infrastructure.Options;
+using UserService.Application.Options;
 using UserService.Infrastructure.Extensions;
 using UserService.API.ExceptionHandling;
 using UserService.API.Grpc;

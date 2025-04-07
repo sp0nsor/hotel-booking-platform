@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using UserService.API.Mappings;
-using UserService.Infrastructure.Options;
+using UserService.Application.Options;
 
 namespace UserService.API.Extensions
 {

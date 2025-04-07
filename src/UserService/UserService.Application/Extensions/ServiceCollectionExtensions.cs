@@ -26,6 +26,11 @@ namespace UserService.Application.Extensions
             services.AddScoped<IValidator<UpdateUserInfoRequest>, UpdateUserInfoRequestValidator>();
             services.AddScoped<IValidator<ConfirmUserRequest>, ConfirmUserRequestValidator>();
 
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<IPasswordService, PasswordService>();
+
             return services;
         }
     }

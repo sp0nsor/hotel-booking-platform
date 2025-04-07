@@ -9,8 +9,6 @@ using MongoDB.Driver;
 using UserService.Infrastructure.Data.Entities;
 using UserService.Infrastructure.Data.Repositories;
 using UserService.Infrastructure.Interfaces.Data;
-using UserService.Infrastructure.Interfaces.Services;
-using UserService.Infrastructure.Services;
 
 namespace UserService.Infrastructure.Extensions
 {
@@ -51,13 +49,8 @@ namespace UserService.Infrastructure.Extensions
 
             services.AddHangfireServer();
 
-            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IRepository<UserEntity>, Repository<UserEntity>>();
             services.AddScoped<IRepository<RefreshTokenEntity>, Repository<RefreshTokenEntity>>();
-
-            services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<ICacheService, CacheService>();
-            services.AddScoped<IPasswordService, PasswordService>();
 
             return services;
         }

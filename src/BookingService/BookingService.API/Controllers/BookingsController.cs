@@ -1,4 +1,4 @@
-﻿using BookingService.Application.Interfaces;
+﻿using BookingService.Application.Interfaces.Public;
 using BookingService.Application.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
