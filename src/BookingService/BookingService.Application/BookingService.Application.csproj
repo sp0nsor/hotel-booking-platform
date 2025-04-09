@@ -12,12 +12,25 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Google.Protobuf" Version="3.30.1" />
+	  <PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
+	  <PackageReference Include="Grpc.Net.ClientFactory" Version="2.70.0" />
+	  <PackageReference Include="Grpc.Tools" Version="2.71.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="3.5.1" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MassTransit" Version="8.3.7" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProtoBuf Include="Services\Internal\Grpc\Hotel\hotel.proto" GrpcServices="Client"></ProtoBuf>
+	  <ProtoBuf Include="Services\Internal\Grpc\Room\room.proto" GrpcServices="Client"></ProtoBuf>
+	  <ProtoBuf Include="Services\Internal\Grpc\User\user.proto" GrpcServices="Client"></ProtoBuf>
   </ItemGroup>
 
 </Project>

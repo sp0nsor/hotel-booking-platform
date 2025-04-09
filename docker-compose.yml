@@ -33,13 +33,25 @@ services:
       - postgre_db
       - rabbitmq
 
+  userservice.api:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: src/UserService/UserService.API/Dockerfile
+    ports:
+      - "5002:8080"
+    networks:
+      - hotel-booking-dev
+    depends_on:
+      - postgre_db
+
   postgre_db:
     container_name: postgres-db
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: hotel-service, booking-service
+      POSTGRES_DB: hotel-service, booking-service, user-service
     ports:
       - "5432:5432"
     networks:

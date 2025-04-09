@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using HotelService.API.Requests.Hotels;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelService.API.Controllers
 {
@@ -26,6 +27,7 @@ namespace HotelService.API.Controllers
             _mediator = mediator;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> CreateHotel(
             [FromForm] CreateHotelRequest createHotelRequest,
@@ -67,6 +69,7 @@ namespace HotelService.API.Controllers
                 : BadRequest(result.Value);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateHotel(
             [FromRoute] Guid id,
@@ -83,6 +86,7 @@ namespace HotelService.API.Controllers
                 : BadRequest(result.Error);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteHotel(
             [FromRoute] Guid id,

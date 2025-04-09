@@ -5,7 +5,6 @@ using HotelService.Application.Extensions;
 using HotelService.DataAccess.Extensions;
 using HotelService.Infrastructure.Extensions;
 using HotelService.Infrastructure.MessageBroker;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +12,8 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 services.AddControllers();
+
+services.AddJwtAuthentication(configuration);
 
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
@@ -54,6 +55,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthorization();
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 

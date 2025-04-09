@@ -23,11 +23,11 @@ namespace BookingService.Application.Mappings
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.Booking.StartDate))
                 .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.Booking.EndDate))
 
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(_ => Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6")))
-                .ForMember(dest => dest.GuestEmail, opt => opt.MapFrom(_ => "mazie.zemlak@ethereal.email"))
-                .ForMember(dest => dest.GuestFirstName, opt => opt.MapFrom(_ => "GuestFirstName"))
-                .ForMember(dest => dest.GuestLastName, opt => opt.MapFrom(_ => "GuestLastName"))
-                .ForMember(dest => dest.GuestPhoneNumber, opt => opt.MapFrom(_ => "+375111111111"));
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                .ForMember(dest => dest.GuestEmail, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.GuestFirstName, opt => opt.MapFrom(src => src.User.FirstName))
+                .ForMember(dest => dest.GuestLastName, opt => opt.MapFrom(src => src.User.LastName))
+                .ForMember(dest => dest.GuestPhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
         }
     }
 }

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "BookingService.Application.Services.Internal.Grpc.User";
+
+service UserService {
+	rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse);
+}
+
+message GetUserByIdResponse {
+	string id = 1;
+	string firstName = 2;
+	string lastName = 3;
+	string phoneNumber = 4;
+	string email = 5;
+	string errorMessage = 6;
+}
+
+message GetUserByIdRequest {
+	string id = 1;
+}
