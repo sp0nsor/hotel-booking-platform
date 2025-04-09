@@ -18,10 +18,10 @@ namespace UserService.Application.Services.Internal
         }
 
         public async Task SendEmailAsync(
-        string recipientEmail,
-        string subject,
-        string body,
-        CancellationToken cancellationToken)
+            string recipientEmail,
+            string subject,
+            string body,
+            CancellationToken cancellationToken)
         {
             var email = CreateEmailMessage(recipientEmail, subject, body);
 

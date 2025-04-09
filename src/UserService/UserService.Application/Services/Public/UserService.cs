@@ -63,14 +63,14 @@ namespace UserService.Application.Services.Public
             CancellationToken cancellationToken)
         {
             var specification = new GetUserByIdSpecification(id);
-            var existUser = await _userRepository.GetSingleAsync(
+            var existingUser = await _userRepository.GetSingleAsync(
                 specification, 
                 cancellationToken);
 
-            if (existUser is null)
+            if (existingUser is null)
                 return Result.Failure<UserDto>("User not foud");
 
-            return _mapper.Map<UserDto>(existUser);
+            return _mapper.Map<UserDto>(existingUser);
         }
 
         public async Task<Result> RegisterUserAsync(
@@ -85,11 +85,11 @@ namespace UserService.Application.Services.Public
                     .Select(e => e.ErrorMessage)));
 
             var specification = new GetUserByEmailSpecification(registerUserRequest.Email);
-            var existUser = await _userRepository.GetSingleAsync(
+            var existingUser = await _userRepository.GetSingleAsync(
                 specification,
                 cancellationToken);
 
-            if (existUser != null)
+            if (existingUser != null)
                 return Result.Failure("The user with this email already exists");
 
             var passwordHash = _passwordService.Generate(registerUserRequest.Password);
@@ -139,10 +139,11 @@ namespace UserService.Application.Services.Public
             if (userEntity is null)
                 return Result.Failure<LoginDto>("This user dosen`t exist");
 
-            if (!userEntity.IsActivated ||
-                !_passwordService.Verify(
-                    loginUserRequest.Password,
-                    userEntity.PasswordHash))
+            var isPasswordValid = _passwordService.Verify(
+                loginUserRequest.Password,
+                userEntity.PasswordHash);
+
+            if (!userEntity.IsActivated || !isPasswordValid)
                 return Result.Failure<LoginDto>("Something went wrong");
 
             var refreshTokenValue = await _refreshTokenService.CreateResreshTokenAsync(
