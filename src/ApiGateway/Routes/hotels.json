@@ -1,0 +1,56 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/hotels/",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "hotel-service",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/hotels/"
+    },
+    {
+      "UpstreamPathTemplate": "/api/hotels{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+
+      "DownstreamPathTemplate": "/api/hotels{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "hotel-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/hotels{hotelId}/rooms/",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+
+      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "hotel-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/hotels{hotelId}/room{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+
+      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "hotel-service",
+          "Port": 8080
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/hotels{hotelId}/bookings/",
+      "UpstreamHttpMethod": [ "GET" ],
+
+      "DownstreamPathTemplate": "/api/hotels{hotelId}/bookings/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/me/bookings/",
+      "UpstreamHttpMethod": [ "GET" ],
+
+      "DownstreamPathTemplate": "/api/users/me/bookings/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/hotels{hotelId}/rooms/{roomId}/bookings",
+      "UpstreamHttpMethod": [ "POST" ],
+
+      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms/{roomId}/bookings",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/me/bookings/{bookingId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+
+      "DownstreamPathTemplate": "/api/users/me/bookings/{bookingId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/me/bookings/{bookingId}/cancelled",
+      "UpstreamHttpMethod": [ "PATCH" ],
+
+      "DownstreamPathTemplate": "/api/users/me/bookings/{bookingId}/cancelled",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 8080
+        }
+      ]
+    }
+  ]
+}
