@@ -40,12 +40,11 @@ services.AddProblemDetails();
 
 var app = builder.Build();
 
-app.ApplyMigrations();
-
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
+    app.ApplyMigrations();
     app.UseCors("AllowAll");
     app.UseSwagger();
     app.UseSwaggerUI();

@@ -4,6 +4,7 @@
       "UpstreamPathTemplate": "/api/hotels/",
       "UpstreamHttpMethod": [ "GET", "POST" ],
 
+      "DownstreamPathTemplate": "/api/hotels/",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -11,7 +12,10 @@
           "Port": 8080
         }
       ],
-      "DownstreamPathTemplate": "/api/hotels/"
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "UpstreamPathTemplate": "/api/hotels{id}",
@@ -24,33 +28,45 @@
           "Host": "hotel-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
-      "UpstreamPathTemplate": "/api/hotels{hotelId}/rooms/",
+      "UpstreamPathTemplate": "/api/hotels/{hotelId}/rooms/",
       "UpstreamHttpMethod": [ "GET", "POST" ],
 
-      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms/",
+      "DownstreamPathTemplate": "/api/hotels/{hotelId}/rooms/",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "hotel-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
-      "UpstreamPathTemplate": "/api/hotels{hotelId}/room{id}",
+      "UpstreamPathTemplate": "/api/hotels/{hotelId}/room{id}",
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
 
-      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms{id}",
+      "DownstreamPathTemplate": "/api/hotels/{hotelId}/rooms{id}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "hotel-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
   ]
 }

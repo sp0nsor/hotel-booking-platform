@@ -6,6 +6,6 @@
     "Routes/users.json"
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5003"
+    "BaseUrl": "http://localhost:5000"
   }
 }

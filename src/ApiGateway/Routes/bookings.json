@@ -1,17 +1,21 @@
 {
   "Routes": [
     {
-      "UpstreamPathTemplate": "/api/hotels{hotelId}/bookings/",
+      "UpstreamPathTemplate": "/api/hotels/{hotelId}/bookings",
       "UpstreamHttpMethod": [ "GET" ],
 
-      "DownstreamPathTemplate": "/api/hotels{hotelId}/bookings/",
+      "DownstreamPathTemplate": "/api/hotels/{hotelId}/bookings",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "booking-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "UpstreamPathTemplate": "/api/users/me/bookings/",
@@ -24,20 +28,28 @@
           "Host": "booking-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
-      "UpstreamPathTemplate": "/api/hotels{hotelId}/rooms/{roomId}/bookings",
+      "UpstreamPathTemplate": "/api/hotels/{hotelId}/rooms/{roomId}/bookings",
       "UpstreamHttpMethod": [ "POST" ],
 
-      "DownstreamPathTemplate": "/api/hotels{hotelId}/rooms/{roomId}/bookings",
+      "DownstreamPathTemplate": "/api/hotels/{hotelId}/rooms/{roomId}/bookings",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "booking-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "UpstreamPathTemplate": "/api/users/me/bookings/{bookingId}",
@@ -50,7 +62,11 @@
           "Host": "booking-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "UpstreamPathTemplate": "/api/users/me/bookings/{bookingId}/cancelled",
@@ -63,7 +79,11 @@
           "Host": "booking-service",
           "Port": 8080
         }
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
   ]
 }

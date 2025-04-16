@@ -1,7 +1,6 @@
 using BookingService.API.ExceptionHandling;
 using BookingService.Application.Extensions;
 using BookingService.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using BookingService.API.Extensions;
 using BookingService.Application.Options;
 

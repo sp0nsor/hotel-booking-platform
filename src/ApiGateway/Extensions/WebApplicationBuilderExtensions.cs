@@ -1,9 +1,10 @@
 ﻿using ApiGateway.Options;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace ApiGateway.Extensions
 {
-    public static class OcelotConfigExtensions
+    public static class WebApplicationBuilderExtensions
     {
         public static void LoadMergedOcelotConfiguration(this WebApplicationBuilder builder)
         {
@@ -27,12 +28,11 @@ namespace ApiGateway.Extensions
             var baseConfig = JObject.Parse(File.ReadAllText(options.BaseConfigPath));
             baseConfig[options.RoutesKey] = new JArray(allRoutes);
 
-            File.WriteAllText(options.MergedConfigPath, baseConfig.ToString());
+            var configString = baseConfig.ToString();
+            var configBytes = Encoding.UTF8.GetBytes(configString);
+            var memoryStream = new MemoryStream(configBytes);
 
-            builder.Configuration.AddJsonFile(
-                options.MergedConfigPath,
-                optional: false,
-                reloadOnChange: true);
+            builder.Configuration.AddJsonStream(memoryStream);
         }
     }
 }
