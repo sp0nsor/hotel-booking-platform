@@ -1,0 +1,11 @@
+{
+  "Routes": [],
+  "RouteFiles": [
+    "Routes/hotels.json",
+    "Routes/bookings.json",
+    "Routes/users.json"
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
+}
