@@ -4,8 +4,11 @@ using UserService.Application.Options;
 using UserService.Infrastructure.Extensions;
 using UserService.API.ExceptionHandling;
 using UserService.API.Grpc;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.UseELK();
 
 var services = builder.Services;
 var configuration = builder.Configuration;
@@ -56,5 +59,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGrpcService<UserGrpcService>();
+
+app.UseSerilogRequestLogging();
 
 app.Run();

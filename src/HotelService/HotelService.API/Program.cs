@@ -5,8 +5,11 @@ using HotelService.Application.Extensions;
 using HotelService.DataAccess.Extensions;
 using HotelService.Infrastructure.Extensions;
 using HotelService.Infrastructure.MessageBroker;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.UseELK();
 
 var services = builder.Services;
 var configuration = builder.Configuration;
@@ -58,5 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.UseAuthentication();
+
+app.UseSerilogRequestLogging();
 
 app.Run();
