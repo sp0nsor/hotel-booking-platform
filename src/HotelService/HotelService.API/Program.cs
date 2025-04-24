@@ -1,3 +1,4 @@
+using HotelService.API.Hubs;
 using HotelService.API.Extensions;
 using HotelService.API.Grpc.Hotel;
 using HotelService.API.Grpc.Room;
@@ -6,6 +7,7 @@ using HotelService.DataAccess.Extensions;
 using HotelService.Infrastructure.Extensions;
 using HotelService.Infrastructure.MessageBroker;
 using Serilog;
+using HotelService.Application.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +63,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.UseAuthentication();
+
+app.MapHub<EntityHub<HotelDto>>("/hotelHub");
+app.MapHub<EntityHub<RoomDto>>("/roomHub");
 
 app.UseSerilogRequestLogging();
 

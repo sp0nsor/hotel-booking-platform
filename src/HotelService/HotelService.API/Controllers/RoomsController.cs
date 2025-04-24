@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
+using HotelService.API.Extensions;
+using HotelService.API.Hubs;
 using HotelService.API.Requests.Rooms;
+using HotelService.Application.DTOs;
 using HotelService.Application.RequestHandlers.Commands.Room.Create;
 using HotelService.Application.RequestHandlers.Commands.Room.Delete;
 using HotelService.Application.RequestHandlers.Commands.Room.Update;
 using HotelService.Application.RequestHandlers.Queries.Room.Get;
 using HotelService.Application.RequestHandlers.Queries.Room.GetById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HotelService.API.Controllers
 {
@@ -14,17 +19,21 @@ namespace HotelService.API.Controllers
     [Route("api/hotels/{hotelId}/rooms")]
     public class RoomsController : ControllerBase
     {
+        private readonly IHubContext<EntityHub<RoomDto>> _hubContext;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
         public RoomsController(
-            IMediator mediator, 
-            IMapper mapper)
+            IMediator mediator,
+            IMapper mapper,
+            IHubContext<EntityHub<RoomDto>> hubContext)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> AddRoomToHotel(
             [FromRoute] Guid hotelId,
@@ -41,6 +50,7 @@ namespace HotelService.API.Controllers
                 : BadRequest(result.Error);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult> GetHotelRooms(
             [FromRoute] Guid hotelId,
@@ -55,6 +65,7 @@ namespace HotelService.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetRoomById(
             [FromRoute] Guid hotelId,
@@ -70,6 +81,7 @@ namespace HotelService.API.Controllers
                 : NotFound(result.Error);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateRoom(
             [FromRoute] Guid hotelId,
@@ -83,11 +95,16 @@ namespace HotelService.API.Controllers
 
             var result = await _mediator.Send(updateRoomCommand, cancellationToken);
 
+            result.WhenSuccess(async room =>
+                await _hubContext.Clients.All
+                    .SendAsync("ReceiveMessage", room, cancellationToken));
+
             return result.IsSuccess
                 ? Ok()
                 : BadRequest(result.Error);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteRoom(
             [FromRoute] Guid id,

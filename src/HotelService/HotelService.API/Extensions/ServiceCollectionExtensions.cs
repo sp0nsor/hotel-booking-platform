@@ -1,9 +1,7 @@
 ﻿using HotelService.API.ExceptionHandling;
 using HotelService.API.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
 
@@ -19,6 +17,8 @@ namespace HotelService.API.Extensions
             };
 
             services.AddGrpc();
+
+            services.AddSignalR();
 
             services.AddMediatR(x =>
                 x.RegisterServicesFromAssemblies(assembles));

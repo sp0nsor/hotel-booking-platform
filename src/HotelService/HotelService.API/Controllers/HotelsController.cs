@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using HotelService.API.Requests.Hotels;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using HotelService.API.Extensions;
+using HotelService.API.Hubs;
 
 namespace HotelService.API.Controllers
 {
@@ -17,14 +20,17 @@ namespace HotelService.API.Controllers
     public class HotelsController : ControllerBase
     {
         private readonly IMapper _mapper;
+        private readonly IHubContext<EntityHub<HotelDto>> _hubContext;
         private readonly IMediator _mediator;
 
         public HotelsController(
             IMapper mapper,
-            IMediator mediator)
+            IMediator mediator,
+            IHubContext<EntityHub<HotelDto>> hubContext)
         {
             _mapper = mapper;
             _mediator = mediator;
+            _hubContext = hubContext;
         }
 
         [Authorize(Roles = "Admin")]
@@ -80,6 +86,10 @@ namespace HotelService.API.Controllers
             updateHotelCommand.Id = id;
 
             var result = await _mediator.Send(updateHotelCommand, cancellationToken);
+
+            result.WhenSuccess(async hotel =>
+                await _hubContext.Clients.All
+                    .SendAsync("ReceiveMessage", hotel, cancellationToken));
 
             return result.IsSuccess
                 ? Ok()

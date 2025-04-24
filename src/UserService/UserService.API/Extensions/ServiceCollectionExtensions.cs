@@ -12,10 +12,6 @@ namespace UserService.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            var accessTokenOptions = configuration
-                .GetSection(nameof(AccessTokenOptions))
-                .Get<AccessTokenOptions>();
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -26,7 +22,7 @@ namespace UserService.API.Extensions
                         ValidateLifetime = false,
                         ValidateIssuerSigningKey = false,
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(configuration[accessTokenOptions.SecretKey])),
+                            Encoding.UTF8.GetBytes(configuration["AccessTokenOptions:SecretKey"])),
                         ClockSkew = TimeSpan.Zero
                     };
                 });

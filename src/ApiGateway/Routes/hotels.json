@@ -11,11 +11,7 @@
           "Host": "hotel-service",
           "Port": 8080
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      ]
     },
     {
       "UpstreamPathTemplate": "/api/hotels{id}",

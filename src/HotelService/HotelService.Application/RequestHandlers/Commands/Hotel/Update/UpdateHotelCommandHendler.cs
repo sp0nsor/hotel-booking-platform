@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using AutoMapper;
+using CSharpFunctionalExtensions;
+using HotelService.Application.DTOs;
 using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
 using MediatR;
@@ -6,8 +8,9 @@ using MediatR;
 namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
 {
     public class UpdateHotelCommandHendler
-        : IRequestHandler<UpdateHotelCommand, Result>
+        : IRequestHandler<UpdateHotelCommand, Result<HotelDto>>
     {
+        private readonly IMapper _mapper;
         private readonly IImageService _imageService;
         private readonly ICacheService _cacheService;
         private readonly IRepository<Core.Models.Hotel> _hotelRepository;
@@ -15,14 +18,16 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
         public UpdateHotelCommandHendler(
             ICacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository,
-            IImageService imageService)
+            IImageService imageService,
+            IMapper mapper)
         {
             _cacheService = cacheService;
             _hotelRepository = hotelRepository;
             _imageService = imageService;
+            _mapper = mapper;
         }
 
-        public async Task<Result> Handle(
+        public async Task<Result<HotelDto>> Handle(
             UpdateHotelCommand request, 
             CancellationToken cancellationToken)
         {
@@ -31,7 +36,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
                 cancellationToken);
 
             if (existHotel is null)
-                return Result.Failure("Hotel not found");
+                return Result.Failure<HotelDto>("Hotel not found");
 
             string imagePath;
 
@@ -68,7 +73,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
                     imagePath,
                     cancellationToken);
 
-                return Result.Failure(createHotelResult.Error);
+                return Result.Failure<HotelDto>(createHotelResult.Error);
             }
 
             var deleteHotelTask = _hotelRepository.UpdateAsync(
@@ -83,7 +88,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
 
             await Task.WhenAll(deleteCacheTask, deleteHotelTask);
 
-            return Result.Success();
+            return Result.Success(_mapper.Map<HotelDto>(createHotelResult.Value));
         }
     }
 }
