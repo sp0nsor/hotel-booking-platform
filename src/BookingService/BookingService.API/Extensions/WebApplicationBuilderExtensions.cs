@@ -6,14 +6,14 @@ namespace BookingService.API.Extensions
 {
     public static class WebApplicationBuilderExtensions
     {
-        public static WebApplicationBuilder UseELK(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder UseElk(this WebApplicationBuilder builder)
         {
             builder.Host.UseSerilog((context, config) =>
             {
                 var environment = context.HostingEnvironment.EnvironmentName;
                 var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                config
+                config  
                     .Enrich.FromLogContext()
                     .Enrich.WithProperty("Environment", environment)
                     .Enrich.WithProperty("Application", assemblyName)
