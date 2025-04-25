@@ -9,7 +9,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.UseELK();
+builder.UseElk();
 
 var services = builder.Services;
 var configuration = builder.Configuration;

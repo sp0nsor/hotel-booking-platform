@@ -6,7 +6,7 @@ namespace UserService.API.Extensions
 {
     public static class WebApplicationBuilderExtensions
     {
-        public static WebApplicationBuilder UseELK(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder UseElk(this WebApplicationBuilder builder)
         {
             builder.Host.UseSerilog((context, config) =>
             {
