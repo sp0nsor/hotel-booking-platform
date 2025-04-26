@@ -2,21 +2,26 @@
 using HotelService.Application.RequestHandlers.Commands.Booking.Update;
 using MassTransit;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Shared.Contracts.Bookings;
 
 namespace HotelService.Infrastructure.MessageBroker.Consumers
 {
-    public class UpdateBookingConsumer : IConsumer<UpdateBookingEvent>
+    public class UpdateBookingConsumer
+        : IConsumer<UpdateBookingEvent>
     {
+        private readonly ILogger<UpdateBookingConsumer> _logger;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
         public UpdateBookingConsumer(
             IMediator mediator,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<UpdateBookingConsumer> logger)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<UpdateBookingEvent> context)
@@ -25,8 +30,8 @@ namespace HotelService.Infrastructure.MessageBroker.Consumers
 
             var result = await _mediator.Send(updateBookingCommand, context.CancellationToken);
 
-            if(result.IsFailure) // elk
-                Console.WriteLine(result.Error);
+            if (result.IsFailure)
+                _logger.LogError($"update booking error: {result.Error}");
         }
     }
 }

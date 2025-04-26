@@ -3,8 +3,11 @@ using BookingService.Application.Extensions;
 using BookingService.Infrastructure.Extensions;
 using BookingService.API.Extensions;
 using BookingService.Application.Options;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.UseElk();
 
 var services = builder.Services;
 var configuration = builder.Configuration;
@@ -56,5 +59,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSerilogRequestLogging();
 
 app.Run();
