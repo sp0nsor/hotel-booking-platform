@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using AutoMapper;
+using CSharpFunctionalExtensions;
+using HotelService.Application.DTOs;
 using HotelService.Application.Interfaces;
 using HotelService.Core.Abstractions;
 using MediatR;
@@ -6,8 +8,9 @@ using MediatR;
 namespace HotelService.Application.RequestHandlers.Commands.Room.Update
 {
     public class UpdateRoomCommandHandler 
-        : IRequestHandler<UpdateRoomCommand, Result>
+        : IRequestHandler<UpdateRoomCommand, Result<RoomDto>>
     {
+        private readonly IMapper _mapper;
         private readonly IImageService _imageService;
         private readonly ICacheService _cacheService;
         private readonly IRepository<Core.Models.Hotel> _hotelRepository;
@@ -17,15 +20,17 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
             IImageService imageService,
             ICacheService cacheService,
             IRepository<Core.Models.Hotel> hotelRepository,
-            IRepository<Core.Models.Room> roomRepository)
+            IRepository<Core.Models.Room> roomRepository,
+            IMapper mapper)
         {
             _imageService = imageService;
             _cacheService = cacheService;
             _hotelRepository = hotelRepository;
             _roomRepository = roomRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Result> Handle(
+        public async Task<Result<RoomDto>> Handle(
             UpdateRoomCommand request, 
             CancellationToken cancellationToken)
         {
@@ -34,7 +39,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                 cancellationToken);
 
             if (existRoom is null)
-                return Result.Failure("Room not found");
+                return Result.Failure<RoomDto>("Room not found");
 
             string imagePath;
 
@@ -53,7 +58,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                     cancellationToken);
             }
 
-            var roomResult = Core.Models.Room.Create(
+            var createRoomResult = Core.Models.Room.Create(
                 request.Id,
                 request.HotelId,
                 request.Capacity,
@@ -63,17 +68,17 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
                 request.Currency,
                 imagePath);
 
-            if (roomResult.IsFailure)
+            if (createRoomResult.IsFailure)
             {
                 await _imageService.DeleteImageAsync(
                     imagePath,
                     CancellationToken.None);
 
-                return Result.Failure(roomResult.Error);
+                return Result.Failure<RoomDto>(createRoomResult.Error);
             }
 
             var deleteRoomTask = _roomRepository.UpdateAsync(
-                roomResult.Value, 
+                createRoomResult.Value, 
                 cancellationToken);
 
             var cachedKey = $"room_{request.Id}";
@@ -84,7 +89,7 @@ namespace HotelService.Application.RequestHandlers.Commands.Room.Update
 
             await Task.WhenAll(deleteCacheTask, deleteRoomTask);
 
-            return Result.Success();
+            return Result.Success(_mapper.Map<RoomDto>(createRoomResult.Value));
         }
     }
 }

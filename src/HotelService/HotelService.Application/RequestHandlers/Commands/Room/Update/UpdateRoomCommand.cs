@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
+using HotelService.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace HotelService.Application.RequestHandlers.Commands.Room.Update
 {
-    public class UpdateRoomCommand : IRequest<Result>
+    public class UpdateRoomCommand : IRequest<Result<RoomDto>>
     {
         public Guid Id { get; set; }
         public Guid HotelId { get; set; }

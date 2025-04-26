@@ -11,11 +11,7 @@
           "Host": "user-service",
           "Port": 8080
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      ]
     },
     {
       "UpstreamPathTemplate": "/api/users/login",
@@ -28,11 +24,7 @@
           "Host": "user-service",
           "Port": 8080
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      ]
     },
     {
       "UpstreamPathTemplate": "/api/users/confirm",
@@ -62,11 +54,7 @@
           "Host": "user-service",
           "Port": 8080
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      ]
     },
     {
       "UpstreamPathTemplate": "/api/users/logout",

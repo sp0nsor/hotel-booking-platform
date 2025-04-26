@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
+using HotelService.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace HotelService.Application.RequestHandlers.Commands.Hotel.Update
 {
-    public class UpdateHotelCommand : IRequest<Result>
+    public class UpdateHotelCommand : IRequest<Result<HotelDto>>
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
